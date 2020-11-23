@@ -12,13 +12,13 @@ temperature = 8  # Kelvin
 W_c = 5e-3 * 1.60217662e-19
 
 # Voltages
-bias_voltage = (10 * W_c) / 1.60217662e-19
+bias_voltage = (1 * W_c) / 1.60217662e-19
 gate_voltage = 0
 
 # Energies
 W = W_c
-W_L = 0 * 1.60217662e-19 * (bias_voltage / 2)
-W_R = 2 * 1.60217662e-19 * (bias_voltage / 2)
+W_L = -1 * 1.60217662e-19 * (bias_voltage / 2)
+W_R = 1 * 1.60217662e-19 * (bias_voltage / 2)
 
 # Tunneling rates
 gamma_zero_left = 125e9  # Hertz
