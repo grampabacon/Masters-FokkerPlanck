@@ -15,6 +15,10 @@ W_c = 5e-3 * 1.60217662e-19
 bias_voltage = (1 * W_c) / 1.60217662e-19
 gate_voltage = 0
 
+# Capacitance
+left_capacitance = 0.3 * 10e-15
+right_capacitance = 0.75 * 10e-15
+
 # Energies
 W = W_c
 W_L = -1 * 1.60217662e-19 * (bias_voltage / 2)

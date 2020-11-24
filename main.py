@@ -10,11 +10,11 @@ thetas = np.linspace(0, 2 * np.pi, theta_divisions)
 d_theta = (2 * np.pi) / theta_divisions
 
 # Range of mechanical energies for plotting
-E_min = 0 * param.W_c
-E_max = 1000000 * param.W_c
+energy_min = 0 * param.W_c
+energy_max = 10000 * param.W_c
 energy_divisions = 1000
-mechanical_energies = np.linspace(E_min, E_max, energy_divisions)
-d_energy = (E_max - E_min) / energy_divisions
+mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions)
+d_energy = (energy_max - energy_min) / energy_divisions
 
 # Array of midpoint energies for averaging over theta
 midpoints = np.ndarray(len(mechanical_energies) - 1)
@@ -38,6 +38,10 @@ def fermi_distribution_derivative_wrt_w_right(mechanical_energy):
 # Energy changes
 def displacement(mechanical_energy):
     return (1 / param.oscillator_frequency) * np.sqrt(np.sqrt((2 * mechanical_energy) / param.oscillator_mass)) * np.sin(thetas)
+
+
+def amplitude(mechanical_energy):
+    return (1 / param.oscillator_frequency) * np.sqrt(np.sqrt((2 * mechanical_energy) / param.oscillator_mass))
 
 
 def energy_change_plus_left(mechanical_energy):
