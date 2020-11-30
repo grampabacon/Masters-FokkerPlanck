@@ -4,6 +4,12 @@ import math
 import inputs.constants as const
 import inputs.parameters as param
 
+##############################################################
+#                                                            #
+# Functions used in the plotting file stationary_solution.py #
+#                                                            #
+##############################################################
+
 # Theta for averaging over phase.
 theta_divisions = 500
 thetas = np.linspace(0, 2 * np.pi, theta_divisions + 1)
