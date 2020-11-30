@@ -5,10 +5,16 @@ import math
 import inputs.constants as const
 import inputs.parameters as param
 
+################################################
+#                                              #
+# See main.py for code used in these functions #
+#                                              #
+################################################
+
 
 # Calculating the integrals
 def stationary_integrand():
-    #return (-main.mechanical_energies * main.kappa()) / main.diffusion()
+    # return (-main.mechanical_energies * main.kappa()) / main.diffusion()
     return (-main.kappa()) / main.diffusion()
 
 
@@ -76,21 +82,37 @@ def plot_regions_seperate_graphs():
         print("Progress: " + str((i + 1) / plots * 100) + "%")
 
 
-# def plot_kappa():
-#     for i in range(4):
-#         param.W = 0 * param.W_c
-#         bias_voltage = i * 2 * param.W_c / const.ELEMENTARY_CHARGE
-#         param.W_L = - const.ELEMENTARY_CHARGE * bias_voltage / 2
-#         param.W_R = const.ELEMENTARY_CHARGE * bias_voltage / 2
-#
-#         plt.plot(main.midpoints / param.W_c, main.kappa(), colors[i])
-#     plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
-#     plt.xlabel("Energy / W_c")
-#     plt.ylabel("Kappa / Hz")
-#     plt.legend(["eVb=2Wc, W=0", "eVb=4Wc, W=0", "eVb=6Wc, W=0", "eVb=8Wc, W=0"])
-#     plt.show()
+def plot_multiple_kappa():
+    for i in range(4):
+        param.W = 0 * param.W_c
+        bias_voltage = i * 2 * param.W_c / const.ELEMENTARY_CHARGE
+        param.W_L = - const.ELEMENTARY_CHARGE * bias_voltage / 2
+        param.W_R = const.ELEMENTARY_CHARGE * bias_voltage / 2
+
+        plt.plot(main.midpoints / param.W_c, main.kappa(), colors[i])
+    plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+    plt.xlabel("Energy / W_c")
+    plt.ylabel("Kappa / Hz")
+    plt.legend(["eVb=2Wc, W=0", "eVb=4Wc, W=0", "eVb=6Wc, W=0", "eVb=8Wc, W=0"])
+    plt.show()
+
+
+def plot_kappa():
+    param.W = 1 * param.W_c
+    param.W_L = 0  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = 2 * param.W_c
+
+    kappas = main.kappa()
+
+    plt.plot(main.mechanical_energies / param.W_c, kappas, "k")
+    plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+    plt.xlabel("Energy / W_c")
+    plt.ylabel("Kappa / Hz")
+    plt.title("W=" + str(param.W // param.W_c) + "W_c, Minimum kappa=%.2f" % np.amin(kappas))
+    plt.show()
 
 
 # plot_regions_seperate_graphs()
 # plots_regions_on_graph()
-plot_regions_seperate_graphs()
+# plot_regions_seperate_graphs()
+plot_kappa()

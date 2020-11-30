@@ -4,6 +4,12 @@ import inputs.constants as const
 import inputs.parameters as param
 import matplotlib.pyplot as plt
 
+#############################################################
+#                                                           #
+# See stationary_solution.py for the Fokker-Planck solution #
+#                                                           #
+#############################################################
+
 # https://www.tutorialspoint.com/matplotlib/matplotlib_contour_plot.htm
 
 # Bias voltage range
