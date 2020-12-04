@@ -137,12 +137,12 @@ def average_occupation(mechanical_energy):
 
 # Occupation derivative
 def average_occupation_derivative_dw(mechanical_energy):
-    return (1 / gamma_total(mechanical_energy) ** 2) * ((gamma_total(mechanical_energy) * gamma_plus_derivative_dw(mechanical_energy)) - (gamma_plus(mechanical_energy) * gamma_total_derivative_dw(mechanical_energy)))
+    return (1 / gamma_total(mechanical_energy) ** 2) * ((gamma_minus(mechanical_energy) * gamma_plus_derivative_dw(mechanical_energy)) - (gamma_plus(mechanical_energy) * gamma_minus_derivative_dw(mechanical_energy)))
 
 
 # Kappa
 # Averaged over the oscillation phase
-def kappa():
+def kappa1():
     kappas = np.ndarray(len(mechanical_energies))
     for i in range(len(mechanical_energies)):
         dn = average_occupation_derivative_dw(mechanical_energies[i])
@@ -153,6 +153,26 @@ def kappa():
         k_left = _k[:-1]
         k = (param.oscillator_frequency / param.quality_factor) + ((param.coupling_force * param.coupling_force / param.oscillator_mass)
                                                                    * (d_theta / 2) * np.sum(k_left + k_right))
+
+        kappas[i] = k
+    return kappas
+
+
+def kappa():
+    kappas = np.ndarray(len(mechanical_energies))
+    for i in range(len(mechanical_energies)):
+        dn = average_occupation_derivative_dw(mechanical_energies[i])
+        gamma_t = gamma_total(mechanical_energies[i])
+
+        _k = ((np.cos(thetas) ** 2) / np.pi) * (dn / gamma_t)
+        # k_right = _k[1:]
+        # k_left = _k[:-1]
+        # k = (param.oscillator_frequency / param.quality_factor) + ((param.coupling_force * param.coupling_force / param.oscillator_mass)
+        #                                                            * (d_theta / 2) * np.sum(k_left + k_right))
+
+        k = np.trapz(_k, dx=d_theta)
+        k *= (param.coupling_force * param.coupling_force / param.oscillator_mass)
+        k += param.oscillator_frequency / param.quality_factor
 
         kappas[i] = k
     return kappas
@@ -169,7 +189,7 @@ def diffusion():
         _d = ((np.cos(thetas) ** 2) / np.pi) * (n * (1 - n)) / gamma_t
         d_right = _d[1:]
         d_left = _d[:-1]
-        #d = (param.coupling_force ** 2 / param.oscillator_mass) * mechanical_energies[i] * (d_theta / 2) * np.sum(d_left + d_right)
+        # d = (param.coupling_force ** 2 / param.oscillator_mass) * mechanical_energies[i] * (d_theta / 2) * np.sum(d_left + d_right)
         d = (param.coupling_force ** 2 / param.oscillator_mass) * (d_theta / 2) * np.sum(d_left + d_right)
 
         diffusions[i] = d

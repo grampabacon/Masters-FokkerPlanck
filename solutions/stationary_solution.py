@@ -18,6 +18,16 @@ def stationary_integrand():
     return (-main.kappa()) / main.diffusion()
 
 
+# def gamma(a):
+#     c_list = [0]
+#     for i in range(len(a)-1):
+#         c = c_list[i]                   # integral up to this point
+#         c += (a[i]+a[i+1])*(dE/2)       # add on next trapezoid
+#         floor(c)
+#         c_list.append(c)                # new total integral
+#     return c_list
+
+
 def perform_stationary_integral(integrands):
     integrated = np.ndarray(len(integrands) - 1)
     for i in range(len(integrands) - 1):
@@ -112,7 +122,63 @@ def plot_kappa():
     plt.show()
 
 
+def plot_diffusion():
+    param.W = 1 * param.W_c
+    param.W_L = 0  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = 2 * param.W_c
+
+    diffusion = main.diffusion()
+
+    plt.plot(main.mechanical_energies / param.W_c, diffusion, "k")
+    plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+    plt.xlabel("Energy / W_c")
+    plt.ylabel("Diffusion / J s^-1")
+    plt.title("W=" + str(param.W // param.W_c) + "W_c, Minimum diffusion=%.2f" % np.amin(diffusion))
+    plt.show()
+
+
+def plot_stationary_integrand():
+    param.W = 1 * param.W_c
+    param.W_L = 0  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = 2 * param.W_c
+
+    plt.plot(main.mechanical_energies / param.W_c, stationary_integrand(), "k")
+    plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+    plt.xlabel("Energy / W_c")
+    plt.ylabel("alpha")
+    plt.title("W=" + str(param.W // param.W_c) + "W_c")
+    plt.show()
+
+
+def plot_stationary_integral():
+    param.W = 1 * param.W_c
+    param.W_L = 0  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = 2 * param.W_c
+
+    plt.plot(main.midpoints / param.W_c, perform_stationary_integral(stationary_integrand()), "k")
+    plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+    plt.xlabel("Energy / W_c")
+    plt.ylabel("\gamma")
+    plt.title("W=" + str(param.W // param.W_c) + "W_c")
+    plt.show()
+
+# def plot_dn_dw():
+#     param.W = 1 * param.W_c
+#     param.W_L = 0  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+#     param.W_R = 2 * param.W_c
+#
+#     dn_dw = np.ndarray(len(main.mechanical_energies))
+#     for i in range(len(main.mechanical_energies)):
+#         # dn_dw[i] = main.average_occupation_derivative_dw(main.mechanical_energies[i])
+#         print(main.mechanical_energies[i])
+#
+#     plt.plot(main.mechanical_energies / param.W_c, dn_dw, "k")
+#     plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+#     plt.xlabel("Energy / W_c")
+#     plt.ylabel("dn/dW")
+#     plt.title("W=" + str(param.W // param.W_c) + "W_c, Minimum diffusion=%.2f" % np.amin(dn_dw))
+#     plt.show()
+
+
 # plot_regions_seperate_graphs()
-# plots_regions_on_graph()
-# plot_regions_seperate_graphs()
-plot_kappa()
+plot_regions_seperate_graphs()
