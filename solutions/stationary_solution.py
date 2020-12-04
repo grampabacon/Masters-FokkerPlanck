@@ -29,11 +29,18 @@ def stationary_integrand():
 
 
 def perform_stationary_integral(integrands):
+    integrated = [0]
+    for i in range(len(integrands) - 1):
+        _i = integrated[i]
+        _i += (integrands[i] + integrands[i + 1]) * (main.d_energy / 2)
+        integrated.append(_i)
+    return integrated
+
+def perform_stationary_integral1(integrands):
     integrated = np.ndarray(len(integrands) - 1)
     for i in range(len(integrands) - 1):
         integrated[i] = (integrands[i] + integrands[i + 1]) * (main.d_energy / 2)
     return integrated
-
 
 ############
 # Plotting #
@@ -84,7 +91,7 @@ def plot_regions_seperate_graphs():
         param.WL = 0
         param.WR = 2 * param.W_c
 
-        plt.plot(main.midpoints / param.W_c, (np.exp(perform_stationary_integral(stationary_integrand()))), colors[i])
+        plt.plot(main.mechanical_energies / param.W_c, (np.exp(perform_stationary_integral(stationary_integrand()))), colors[i])
         plt.xlabel("Mechanical Energy / W_c")
         plt.ylabel("P(E)")
         plt.legend(["eV_b=" + str(param.bias_voltage * const.ELEMENTARY_CHARGE // param.W_c) + "W_c | W=" + str(param.W // param.W_c) + "W_c", ])

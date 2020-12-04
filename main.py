@@ -17,7 +17,7 @@ d_theta = (2 * np.pi) / theta_divisions
 
 # Range of mechanical energies for plotting
 energy_min = 0 * param.W_c
-energy_max = 100000 * param.W_c
+energy_max = 10 * param.W_c
 energy_divisions = 10000
 mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions + 1)
 d_energy = (energy_max - energy_min) / energy_divisions
