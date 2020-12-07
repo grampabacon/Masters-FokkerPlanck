@@ -27,8 +27,8 @@ w_list = np.linspace(w_min, w_max, w_divisions)
 d_w = (w_max - w_min) / w_divisions
 
 gate_capacitance = 10e-15
-left_capacitance = 0.3 * 10e-15
-right_capacitance = 0.75 * 10e-15
+left_capacitance = 10e-15
+right_capacitance = 10e-15
 
 
 def total_capacitance():

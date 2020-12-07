@@ -17,7 +17,7 @@ d_theta = (2 * np.pi) / theta_divisions
 
 # Range of mechanical energies for plotting
 energy_min = 0 * param.W_c
-energy_max = 10 * param.W_c
+energy_max = 100000 * param.W_c
 energy_divisions = 10000
 mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions + 1)
 d_energy = (energy_max - energy_min) / energy_divisions
@@ -187,10 +187,11 @@ def diffusion():
         gamma_t = gamma_total(mechanical_energies[i])
 
         _d = ((np.cos(thetas) ** 2) / np.pi) * (n * (1 - n)) / gamma_t
-        d_right = _d[1:]
-        d_left = _d[:-1]
-        # d = (param.coupling_force ** 2 / param.oscillator_mass) * mechanical_energies[i] * (d_theta / 2) * np.sum(d_left + d_right)
-        d = (param.coupling_force ** 2 / param.oscillator_mass) * (d_theta / 2) * np.sum(d_left + d_right)
+        # d_right = _d[1:]
+        # d_left = _d[:-1]
+        # d = (param.coupling_force ** 2 / param.oscillator_mass) * (d_theta / 2) * np.sum(d_left + d_right)
+        d = np.trapz(_d, dx=d_theta)
+        d *= (param.coupling_force ** 2 / param.oscillator_mass)
 
         diffusions[i] = d
     return diffusions

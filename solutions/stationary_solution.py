@@ -18,17 +18,7 @@ def stationary_integrand():
     return (-main.kappa()) / main.diffusion()
 
 
-# def gamma(a):
-#     c_list = [0]
-#     for i in range(len(a)-1):
-#         c = c_list[i]                   # integral up to this point
-#         c += (a[i]+a[i+1])*(dE/2)       # add on next trapezoid
-#         floor(c)
-#         c_list.append(c)                # new total integral
-#     return c_list
-
-
-def perform_stationary_integral(integrands):
+def perform_stationary_integral1(integrands):
     integrated = [0]
     for i in range(len(integrands) - 1):
         _i = integrated[i]
@@ -36,7 +26,8 @@ def perform_stationary_integral(integrands):
         integrated.append(_i)
     return integrated
 
-def perform_stationary_integral1(integrands):
+
+def perform_stationary_integral(integrands):
     integrated = np.ndarray(len(integrands) - 1)
     for i in range(len(integrands) - 1):
         integrated[i] = (integrands[i] + integrands[i + 1]) * (main.d_energy / 2)
@@ -50,7 +41,7 @@ colors = ["r-", "b-", "g-", "m-", "c-", "y-", "k-", "r--", "b--", "g--", "m--"]
 
 # Plot P(E) against W_c for  current parameters
 def plot_p():
-    plt.plot(main.midpoints / param.W_c, np.exp(perform_stationary_integral(stationary_integrand())), "k")
+    plt.plot(main.mechanical_energies // param.W_c, np.exp(perform_stationary_integral(stationary_integrand())), "k")
     plt.xlabel("Energy / W_c")
     plt.ylabel("P(E)")
     plt.show()
@@ -99,34 +90,22 @@ def plot_regions_seperate_graphs():
         print("Progress: " + str((i + 1) / plots * 100) + "%")
 
 
-def plot_multiple_kappa():
-    for i in range(4):
-        param.W = 0 * param.W_c
-        bias_voltage = i * 2 * param.W_c / const.ELEMENTARY_CHARGE
-        param.W_L = - const.ELEMENTARY_CHARGE * bias_voltage / 2
-        param.W_R = const.ELEMENTARY_CHARGE * bias_voltage / 2
+# def plot_multiple_kappa():
+#     for i in range(4):
+#         param.W = 0 * param.W_c
+#         bias_voltage = i * 2 * param.W_c / const.ELEMENTARY_CHARGE
+#         param.W_L = - const.ELEMENTARY_CHARGE * bias_voltage / 2
+#         param.W_R = const.ELEMENTARY_CHARGE * bias_voltage / 2
+#
+#         plt.plot(main.midpoints / param.W_c, main.kappa(), colors[i])
+#     plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+#     plt.xlabel("Energy / W_c")
+#     plt.ylabel("Kappa / Hz")
+#     plt.legend(["eVb=2Wc, W=0", "eVb=4Wc, W=0", "eVb=6Wc, W=0", "eVb=8Wc, W=0"])
+#     plt.show()
 
-        plt.plot(main.midpoints / param.W_c, main.kappa(), colors[i])
-    plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
-    plt.xlabel("Energy / W_c")
-    plt.ylabel("Kappa / Hz")
-    plt.legend(["eVb=2Wc, W=0", "eVb=4Wc, W=0", "eVb=6Wc, W=0", "eVb=8Wc, W=0"])
-    plt.show()
 
 
-def plot_kappa():
-    param.W = 1 * param.W_c
-    param.W_L = 0  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
-    param.W_R = 2 * param.W_c
-
-    kappas = main.kappa()
-
-    plt.plot(main.mechanical_energies / param.W_c, kappas, "k")
-    plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
-    plt.xlabel("Energy / W_c")
-    plt.ylabel("Kappa / Hz")
-    plt.title("W=" + str(param.W // param.W_c) + "W_c, Minimum kappa=%.2f" % np.amin(kappas))
-    plt.show()
 
 
 def plot_diffusion():
@@ -187,5 +166,50 @@ def plot_stationary_integral():
 #     plt.show()
 
 
+# def plot_multiple_kappa():
+#     legend = []
+#     for i in range(2):
+#         bias_voltage = i * 2 * param.W_c / const.ELEMENTARY_CHARGE
+#         param.W_L = - const.ELEMENTARY_CHARGE * bias_voltage / 2
+#         param.W_R = const.ELEMENTARY_CHARGE * bias_voltage / 2
+#         for j in range(3):
+#             param.W = j * param.W_c
+#
+#             legend.append("W=" + str(param.W // param.W_c) + ";eV_b=" + str(param.bias_voltage * const.ELEMENTARY_CHARGE // param.W_c))
+#             plt.plot(main.mechanical_energies / param.W_c, main.kappa(), colors[i])
+#     plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+#     plt.xlabel("Energy / W_c")
+#     plt.ylabel("Kappa / Hz")
+#     plt.legend(["eVb=2Wc, W=0", "eVb=4Wc, W=0", "eVb=6Wc, W=0", "eVb=8Wc, W=0"])
+#     plt.show()
+
+def plot_kappa():
+    param.W = 0 * param.W_c
+    param.W_L = - 1 * param.W_c  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = 1 * param.W_c
+
+    kappas = main.kappa()
+
+    plt.plot(main.mechanical_energies / param.W_c, kappas, "k")
+    plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+    plt.xlabel("Energy / W_c")
+    plt.ylabel("Kappa / Hz")
+    plt.title("$W$=" + str(param.W // param.W_c) + "$W_c$, $W_L$=" + str(param.W_L // param.W_c) + "$W_c$, $W_R$=" + str(param.W_R // param.W_c) + "$W_c$, Min($\kappa$)=%.2f" % np.amin(kappas))
+    plt.show()
+
+
+def plot_prob():
+    param.W = 0 * param.W_c
+    param.W_L = - 1 * param.W_c  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = 1 * param.W_c
+
+    plt.plot(main.midpoints // param.W_c, np.exp(perform_stationary_integral(stationary_integrand())), "k")
+    plt.xlabel("Energy / W_c")
+    plt.ylabel("P(E)")
+    plt.title("$W$=" + str(param.W // param.W_c) + "$W_c$, $W_L$=" + str(param.W_L // param.W_c) + "$W_c$, $W_R$=" + str(param.W_R // param.W_c) + "$W_c$")
+
+    plt.show()
+
+
 # plot_regions_seperate_graphs()
-plot_regions_seperate_graphs()
+plot_prob()
