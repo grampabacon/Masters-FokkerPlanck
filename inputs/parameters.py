@@ -1,7 +1,7 @@
 # Oscillator variables
 oscillator_mass = 21.3e-21  # kg
 oscillator_frequency = 10e9  # Hertz
-quality_factor = 10e5
+quality_factor = 10e55
 
 # System variables
 coupling_parameter = 170

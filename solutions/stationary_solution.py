@@ -13,6 +13,10 @@ import inputs.parameters as param
 ################################################
 
 
+gate_capacitance = 10e-15
+left_capacitance = 10e-15
+right_capacitance = 10e-15
+
 # Calculating the integrals
 def stationary_integrand():
     # return (-main.mechanical_energies * main.kappa()) / main.diffusion()
@@ -183,10 +187,25 @@ def plot_stationary_integral():
 #     plt.legend(["eVb=2Wc, W=0", "eVb=4Wc, W=0", "eVb=6Wc, W=0", "eVb=8Wc, W=0"])
 #     plt.show()
 
+
+def plot_prob():
+    param.W = 8 * param.W_c
+    param.W_L = 4 * param.W_c  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = 12 * param.W_c
+
+    plt.plot(main.mechanical_energies // param.W_c, np.exp(perform_stationary_integral(stationary_integrand())), "k")
+    plt.xlabel("Energy / W_c")
+    plt.ylabel("P(E)")
+    plt.title("$W$=" + str(param.W // param.W_c) + "$W_c$, $W_L$=" + str(param.W_L // param.W_c) + "$W_c$, $W_R$=" + str(param.W_R // param.W_c) + "$W_c$")
+
+    plt.show()
+
+
 def plot_kappa():
-    param.W = 0 * param.W_c
-    param.W_L = - 1 * param.W_c  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
-    param.W_R = 1 * param.W_c
+    param.W = -4 * param.W_c
+    bias = -8 * param.W_c / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = w_right(bias)
 
     kappas = main.kappa()
 
@@ -198,18 +217,17 @@ def plot_kappa():
     plt.show()
 
 
-def plot_prob():
-    param.W = 0 * param.W_c
-    param.W_L = - 1 * param.W_c  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
-    param.W_R = 1 * param.W_c
+def total_capacitance():
+    return gate_capacitance + left_capacitance + right_capacitance
 
-    plt.plot(main.midpoints // param.W_c, np.exp(perform_stationary_integral(stationary_integrand())), "k")
-    plt.xlabel("Energy / W_c")
-    plt.ylabel("P(E)")
-    plt.title("$W$=" + str(param.W // param.W_c) + "$W_c$, $W_L$=" + str(param.W_L // param.W_c) + "$W_c$, $W_R$=" + str(param.W_R // param.W_c) + "$W_c$")
 
-    plt.show()
+def w_left(bias):
+    return (const.ELEMENTARY_CHARGE ** 2 / total_capacitance()) * ((1 / 2) - (right_capacitance * bias / const.ELEMENTARY_CHARGE))
+
+
+def w_right(bias):
+    return (const.ELEMENTARY_CHARGE ** 2 / total_capacitance()) * ((1 / 2) + (left_capacitance * bias / const.ELEMENTARY_CHARGE))
 
 
 # plot_regions_seperate_graphs()
-plot_prob()
+plot_kappa()
