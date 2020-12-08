@@ -5,6 +5,7 @@ import math
 import inputs.constants as const
 import inputs.parameters as param
 
+
 ################################################
 #                                              #
 # See main.py for code used in these functions #
@@ -18,7 +19,7 @@ def stationary_integrand():
     return (-main.kappa()) / main.diffusion()
 
 
-def perform_stationary_integral1(integrands):
+def perform_stationary_integral(integrands):
     integrated = [0]
     for i in range(len(integrands) - 1):
         _i = integrated[i]
@@ -27,11 +28,12 @@ def perform_stationary_integral1(integrands):
     return integrated
 
 
-def perform_stationary_integral(integrands):
+def perform_stationary_integral1(integrands):
     integrated = np.ndarray(len(integrands) - 1)
     for i in range(len(integrands) - 1):
         integrated[i] = (integrands[i] + integrands[i + 1]) * (main.d_energy / 2)
     return integrated
+
 
 ############
 # Plotting #
@@ -105,9 +107,6 @@ def plot_regions_seperate_graphs():
 #     plt.show()
 
 
-
-
-
 def plot_diffusion():
     param.W = 1 * param.W_c
     param.W_L = 0  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
@@ -147,6 +146,7 @@ def plot_stationary_integral():
     plt.ylabel("\gamma")
     plt.title("W=" + str(param.W // param.W_c) + "W_c")
     plt.show()
+
 
 # def plot_dn_dw():
 #     param.W = 1 * param.W_c
