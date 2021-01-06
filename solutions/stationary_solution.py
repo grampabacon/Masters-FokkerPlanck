@@ -189,9 +189,10 @@ def plot_stationary_integral():
 
 
 def plot_prob():
-    param.W = 8 * param.W_c
-    param.W_L = 4 * param.W_c  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
-    param.W_R = 12 * param.W_c
+    param.W = -3 * param.W_c
+    bias = 11 * param.W_c / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    param.W_R = w_right(bias)
 
     plt.plot(main.mechanical_energies // param.W_c, np.exp(perform_stationary_integral(stationary_integrand())), "k")
     plt.xlabel("Energy / W_c")
@@ -202,8 +203,8 @@ def plot_prob():
 
 
 def plot_kappa():
-    param.W = -4 * param.W_c
-    bias = -8 * param.W_c / const.ELEMENTARY_CHARGE
+    param.W = 2 * param.W_c
+    bias = 57 * param.W_c / const.ELEMENTARY_CHARGE
     param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
     param.W_R = w_right(bias)
 
@@ -213,7 +214,7 @@ def plot_kappa():
     plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
     plt.xlabel("Energy / W_c")
     plt.ylabel("Kappa / Hz")
-    plt.title("$W$=" + str(param.W // param.W_c) + "$W_c$, $W_L$=" + str(param.W_L // param.W_c) + "$W_c$, $W_R$=" + str(param.W_R // param.W_c) + "$W_c$, Min($\kappa$)=%.2f" % np.amin(kappas))
+    plt.title("$W$=" + str(round(param.W / param.W_c, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE / param.W_c, 1)) + "$W_c$; $W_L$=" + str(round(param.W_L / param.W_c, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R / param.W_c, 1)) + "$W_c$, Min($\kappa$)=%.2f" % np.amin(kappas))
     plt.show()
 
 

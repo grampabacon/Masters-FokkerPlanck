@@ -5,7 +5,7 @@ quality_factor = 10e55
 
 # System variables
 coupling_parameter = 170
-coupling_force = 6.179485810162524e-13
+coupling_force = 6.1661e-13
 temperature = 8  # Kelvin
 
 # Energy scale

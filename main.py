@@ -11,13 +11,13 @@ import inputs.parameters as param
 ##############################################################
 
 # Theta for averaging over phase.
-theta_divisions = 500
+theta_divisions = 1000
 thetas = np.linspace(0, np.pi, theta_divisions + 1)
 d_theta = (np.pi) / theta_divisions
 
 # Range of mechanical energies for plotting
 energy_min = 0 * param.W_c
-energy_max = 1000000 * param.W_c
+energy_max = 10000000 * param.W_c
 energy_divisions = 10000
 mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions + 1)
 d_energy = (energy_max - energy_min) / energy_divisions
@@ -140,22 +140,22 @@ def average_occupation_derivative_dw(mechanical_energy):
     return (1 / gamma_total(mechanical_energy) ** 2) * ((gamma_minus(mechanical_energy) * gamma_plus_derivative_dw(mechanical_energy)) - (gamma_plus(mechanical_energy) * gamma_minus_derivative_dw(mechanical_energy)))
 
 
-# Kappa
-# Averaged over the oscillation phase
-def kappa1():
-    kappas = np.ndarray(len(mechanical_energies))
-    for i in range(len(mechanical_energies)):
-        dn = average_occupation_derivative_dw(mechanical_energies[i])
-        gamma_t = gamma_total(mechanical_energies[i])
-
-        _k = ((np.cos(thetas) ** 2) / np.pi) * (dn / gamma_t)
-        k_right = _k[1:]
-        k_left = _k[:-1]
-        k = (param.oscillator_frequency / param.quality_factor) + ((param.coupling_force * param.coupling_force / param.oscillator_mass)
-                                                                   * (d_theta / 2) * np.sum(k_left + k_right))
-
-        kappas[i] = k
-    return kappas
+# # Kappa
+# # Averaged over the oscillation phase
+# def kappa1():
+#     kappas = np.ndarray(len(mechanical_energies))
+#     for i in range(len(mechanical_energies)):
+#         dn = average_occupation_derivative_dw(mechanical_energies[i])
+#         gamma_t = gamma_total(mechanical_energies[i])
+#
+#         _k = ((np.cos(thetas) ** 2) / np.pi) * (dn / gamma_t)
+#         k_right = _k[1:]
+#         k_left = _k[:-1]
+#         k = (param.oscillator_frequency / param.quality_factor) + ((param.coupling_force * param.coupling_force / param.oscillator_mass)
+#                                                                    * (d_theta / 2) * np.sum(k_left + k_right))
+#
+#         kappas[i] = k
+#     return kappas
 
 
 def kappa():
