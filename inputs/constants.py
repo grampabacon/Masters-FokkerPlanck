@@ -1,3 +1,3 @@
 REDUCED_PLANCK = 1.054571817e-34  # Joule second
-BOLTZMANN = 1.380649e-23  # Joules per Kelvin
+# BOLTZMANN = 1.380649e-23  # Joules per Kelvin
 ELEMENTARY_CHARGE = 1.60217662e-19  # Coulomb

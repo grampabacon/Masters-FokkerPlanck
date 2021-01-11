@@ -13,7 +13,7 @@ import inputs.parameters as param
 ################################################
 
 
-gate_capacitance = 10e-15
+gate_capacitance = 0  # 10e-15
 left_capacitance = 10e-15
 right_capacitance = 10e-15
 
@@ -32,11 +32,11 @@ def perform_stationary_integral(integrands):
     return integrated
 
 
-def perform_stationary_integral1(integrands):
-    integrated = np.ndarray(len(integrands) - 1)
-    for i in range(len(integrands) - 1):
-        integrated[i] = (integrands[i] + integrands[i + 1]) * (main.d_energy / 2)
-    return integrated
+# def perform_stationary_integral1(integrands):
+#     integrated = np.ndarray(len(integrands) - 1)
+#     for i in range(len(integrands) - 1):
+#         integrated[i] = (integrands[i] + integrands[i + 1]) * (main.d_energy / 2)
+#     return integrated
 
 
 ############
@@ -189,32 +189,32 @@ def plot_stationary_integral():
 
 
 def plot_prob():
-    param.W = -3 * param.W_c
-    bias = 11 * param.W_c / const.ELEMENTARY_CHARGE
+    param.W = 2
+    bias = 8 / const.ELEMENTARY_CHARGE
     param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
     param.W_R = w_right(bias)
 
-    plt.plot(main.mechanical_energies // param.W_c, np.exp(perform_stationary_integral(stationary_integrand())), "k")
+    plt.plot(main.mechanical_energies, np.exp(perform_stationary_integral(stationary_integrand())), "k")
     plt.xlabel("Energy / W_c")
     plt.ylabel("P(E)")
-    plt.title("$W$=" + str(param.W // param.W_c) + "$W_c$, $W_L$=" + str(param.W_L // param.W_c) + "$W_c$, $W_R$=" + str(param.W_R // param.W_c) + "$W_c$")
+    plt.title("$W$=" + str(param.W) + "$W_c$, $W_L$=" + str(param.W_L) + "$W_c$, $W_R$=" + str(param.W_R) + "$W_c$")
 
     plt.show()
 
 
 def plot_kappa():
-    param.W = 2 * param.W_c
-    bias = 57 * param.W_c / const.ELEMENTARY_CHARGE
+    param.W = 2  # * param.W_c
+    bias = 5 / const.ELEMENTARY_CHARGE
     param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
     param.W_R = w_right(bias)
 
     kappas = main.kappa()
 
-    plt.plot(main.mechanical_energies / param.W_c, kappas, "k")
+    plt.plot(main.mechanical_energies, kappas, "k")
     plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
     plt.xlabel("Energy / W_c")
     plt.ylabel("Kappa / Hz")
-    plt.title("$W$=" + str(round(param.W / param.W_c, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE / param.W_c, 1)) + "$W_c$; $W_L$=" + str(round(param.W_L / param.W_c, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R / param.W_c, 1)) + "$W_c$, Min($\kappa$)=%.2f" % np.amin(kappas))
+    plt.title("$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$; $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$, Min($\kappa$)=%.2f" % np.amin(kappas))
     plt.show()
 
 
@@ -223,11 +223,11 @@ def total_capacitance():
 
 
 def w_left(bias):
-    return (const.ELEMENTARY_CHARGE ** 2 / total_capacitance()) * ((1 / 2) - (right_capacitance * bias / const.ELEMENTARY_CHARGE))
+    return (const.ELEMENTARY_CHARGE ** 2 / total_capacitance()) * ((1 / (2 * param.W_c)) - (right_capacitance * bias / const.ELEMENTARY_CHARGE))
 
 
 def w_right(bias):
-    return (const.ELEMENTARY_CHARGE ** 2 / total_capacitance()) * ((1 / 2) + (left_capacitance * bias / const.ELEMENTARY_CHARGE))
+    return (const.ELEMENTARY_CHARGE ** 2 / total_capacitance()) * ((1 / (2 * param.W_c)) + (left_capacitance * bias / const.ELEMENTARY_CHARGE))
 
 
 # plot_regions_seperate_graphs()

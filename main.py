@@ -13,11 +13,11 @@ import inputs.parameters as param
 # Theta for averaging over phase.
 theta_divisions = 1000
 thetas = np.linspace(0, np.pi, theta_divisions + 1)
-d_theta = (np.pi) / theta_divisions
+d_theta = (2 * np.pi) / theta_divisions
 
 # Range of mechanical energies for plotting
-energy_min = 0 * param.W_c
-energy_max = 10000000 * param.W_c
+energy_min = 0
+energy_max = 10000000
 energy_divisions = 10000
 mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions + 1)
 d_energy = (energy_max - energy_min) / energy_divisions
@@ -28,22 +28,22 @@ for j in range(len(mechanical_energies) - 1):
     midpoints[j] = (mechanical_energies[j] + mechanical_energies[j + 1]) / 2
 
 
-# Fermi distribution TODO: Check chemical potential
+# Fermi distribution
 def fermi_distribution(energy):
-    return 1 / (1 + np.exp(energy / (const.BOLTZMANN * param.temperature)))
+    return 1 / (1 + np.exp(energy / (0.2)))
 
 
 def fermi_distribution_derivative_wrt_w_left(mechanical_energy):
-    return (- np.exp(- energy_change_plus_left(mechanical_energy) / (const.BOLTZMANN * param.temperature)) / (const.BOLTZMANN * param.temperature)) * fermi_distribution(- energy_change_plus_left(mechanical_energy)) ** 2
+    return (- np.exp(- energy_change_plus_left(mechanical_energy) / 0.2) / 0.2) * (fermi_distribution(- energy_change_plus_left(mechanical_energy)) ** 2)
 
 
 def fermi_distribution_derivative_wrt_w_right(mechanical_energy):
-    return (- np.exp(- energy_change_plus_right(mechanical_energy) / (const.BOLTZMANN * param.temperature)) / (const.BOLTZMANN * param.temperature)) * fermi_distribution(- energy_change_plus_right(mechanical_energy)) ** 2
+    return (- np.exp(- energy_change_plus_right(mechanical_energy) / 0.2) / 0.2) * (fermi_distribution(- energy_change_plus_right(mechanical_energy)) ** 2)
 
 
 # Energy changes
 def displacement(mechanical_energy):
-    return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy) / param.oscillator_mass) * np.sin(thetas)
+    return ((1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass) * np.sin(thetas)) / param.W_c
 
 
 def energy_change_plus_left(mechanical_energy):
@@ -72,11 +72,11 @@ def gamma_plus_right(mechanical_energy):
 
 
 def gamma_minus_left(mechanical_energy):
-    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_plus_left(mechanical_energy)) * (fermi_distribution(energy_change_minus_left(mechanical_energy)))
+    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(mechanical_energy)) * (fermi_distribution(energy_change_minus_left(mechanical_energy)))
 
 
 def gamma_minus_right(mechanical_energy):
-    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_plus_right(mechanical_energy)) * (fermi_distribution(energy_change_minus_right(mechanical_energy)))
+    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(mechanical_energy)) * (fermi_distribution(energy_change_minus_right(mechanical_energy)))
 
 
 # Tunneling rate derivatives
@@ -164,7 +164,7 @@ def kappa():
         dn = average_occupation_derivative_dw(mechanical_energies[i])
         gamma_t = gamma_total(mechanical_energies[i])
 
-        _k = ((np.cos(thetas) ** 2) / np.pi) * (dn / gamma_t)
+        _k = ((np.cos(thetas) ** 2) / (2 * np.pi)) * (dn / gamma_t)
         # k_right = _k[1:]
         # k_left = _k[:-1]
         # k = (param.oscillator_frequency / param.quality_factor) + ((param.coupling_force * param.coupling_force / param.oscillator_mass)

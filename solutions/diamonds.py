@@ -26,7 +26,7 @@ w_divisions = 1000
 w_list = np.linspace(w_min, w_max, w_divisions)
 d_w = (w_max - w_min) / w_divisions
 
-gate_capacitance = 10e-15
+gate_capacitance = 0
 left_capacitance = 10e-15
 right_capacitance = 10e-15
 
