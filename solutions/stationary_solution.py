@@ -5,7 +5,6 @@ import math
 import inputs.constants as const
 import inputs.parameters as param
 
-
 ################################################
 #                                              #
 # See main.py for code used in these functions #
@@ -17,10 +16,11 @@ gate_capacitance = 0  # 10e-15
 left_capacitance = 10e-15
 right_capacitance = 10e-15
 
+
 # Calculating the integrals
 def stationary_integrand():
     # return (-main.mechanical_energies * main.kappa()) / main.diffusion()
-    return (-main.kappa()) / main.diffusion()
+    return - main.kappa() / main.diffusion()
 
 
 def perform_stationary_integral(integrands):
@@ -189,22 +189,22 @@ def plot_stationary_integral():
 
 
 def plot_prob():
-    param.W = 2
-    bias = 8 / const.ELEMENTARY_CHARGE
+    param.W = 0
+    bias = 6 / const.ELEMENTARY_CHARGE
     param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
     param.W_R = w_right(bias)
 
     plt.plot(main.mechanical_energies, np.exp(perform_stationary_integral(stationary_integrand())), "k")
     plt.xlabel("Energy / W_c")
     plt.ylabel("P(E)")
-    plt.title("$W$=" + str(param.W) + "$W_c$, $W_L$=" + str(param.W_L) + "$W_c$, $W_R$=" + str(param.W_R) + "$W_c$")
+    plt.title("$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$, $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$", y=1.08)
 
     plt.show()
 
 
 def plot_kappa():
-    param.W = 2  # * param.W_c
-    bias = 5 / const.ELEMENTARY_CHARGE
+    param.W = 0  # * param.W_c
+    bias = 6 / const.ELEMENTARY_CHARGE
     param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
     param.W_R = w_right(bias)
 
@@ -214,7 +214,9 @@ def plot_kappa():
     plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
     plt.xlabel("Energy / W_c")
     plt.ylabel("Kappa / Hz")
-    plt.title("$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$; $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$, Min($\kappa$)=%.2f" % np.amin(kappas))
+    plt.title(
+        "$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$; $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$, Min($\kappa$)=%.2f" % np.amin(
+            kappas), y=1.08)
     plt.show()
 
 

@@ -17,7 +17,7 @@ d_theta = (2 * np.pi) / theta_divisions
 
 # Range of mechanical energies for plotting
 energy_min = 0
-energy_max = 10000000
+energy_max = 20000000
 energy_divisions = 10000
 mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions + 1)
 d_energy = (energy_max - energy_min) / energy_divisions
@@ -30,36 +30,36 @@ for j in range(len(mechanical_energies) - 1):
 
 # Fermi distribution
 def fermi_distribution(energy):
-    return 1 / (1 + np.exp(energy / (0.2)))
+    return 1 / (1 + np.exp(energy / param.kT))
 
 
 def fermi_distribution_derivative_wrt_w_left(mechanical_energy):
-    return (- np.exp(- energy_change_plus_left(mechanical_energy) / 0.2) / 0.2) * (fermi_distribution(- energy_change_plus_left(mechanical_energy)) ** 2)
+    return (- np.exp(- energy_change_plus_left(mechanical_energy) / param.kT) / param.kT) * (fermi_distribution(- energy_change_plus_left(mechanical_energy)) ** 2)
 
 
 def fermi_distribution_derivative_wrt_w_right(mechanical_energy):
-    return (- np.exp(- energy_change_plus_right(mechanical_energy) / 0.2) / 0.2) * (fermi_distribution(- energy_change_plus_right(mechanical_energy)) ** 2)
+    return (- np.exp(- energy_change_plus_right(mechanical_energy) / param.kT) / param.kT) * (fermi_distribution(- energy_change_plus_right(mechanical_energy)) ** 2)
 
 
 # Energy changes
 def displacement(mechanical_energy):
-    return ((1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass) * np.sin(thetas)) / param.W_c
+    return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass) * np.sin(thetas)
 
 
 def energy_change_plus_left(mechanical_energy):
-    return - param.W + param.W_L - param.coupling_force * displacement(mechanical_energy)
+    return - param.W + param.W_L - (param.coupling_force * displacement(mechanical_energy) / param.W_c)
 
 
 def energy_change_plus_right(mechanical_energy):
-    return - param.W + param.W_R - param.coupling_force * displacement(mechanical_energy)
+    return - param.W + param.W_R - (param.coupling_force * displacement(mechanical_energy) / param.W_c)
 
 
 def energy_change_minus_left(mechanical_energy):
-    return param.W - param.W_L + param.coupling_force * displacement(mechanical_energy)
+    return param.W - param.W_L + (param.coupling_force * displacement(mechanical_energy) / param.W_c)
 
 
 def energy_change_minus_right(mechanical_energy):
-    return param.W - param.W_R + param.coupling_force * displacement(mechanical_energy)
+    return param.W - param.W_R + (param.coupling_force * displacement(mechanical_energy) / param.W_c)
 
 
 # Tunneling rates

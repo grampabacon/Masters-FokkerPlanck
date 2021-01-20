@@ -1,12 +1,14 @@
 # Oscillator variables
 oscillator_mass = 21.3e-21  # kg
 oscillator_frequency = 10e9  # Hertz
-quality_factor = 10e5
+quality_factor = 10e55
 
 # System variables
 coupling_parameter = 170
 coupling_force = 6.1661e-13
 temperature = 8  # Kelvin
+
+kT = 0.2
 
 # Energy scale
 W_c = 5e-3 * 1.60217662e-19
