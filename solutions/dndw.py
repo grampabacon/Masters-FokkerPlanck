@@ -129,14 +129,16 @@ def e_bias_right(w):
 
 def plot_plane():
     dn = d_n(w_mesh, bias_mesh)
-    # plt.contourf(w_mesh, bias_mesh, dn, 20, cmap='RdGy')
+    #plt.contourf(w_mesh, bias_mesh, dn, 20, cmap='RdGy')
     contours = plt.contour(w_mesh, bias_mesh, dn, 1, colors='black', levels=[0], linestyles='dashed')
 
     plt.imshow(dn, extent=[-5, 5, 0, 10], origin='lower', cmap='coolwarm', alpha=1)
+    #plt.imshow(dn, extent=[-5, 5, 0, 10], origin='lower', cmap='RdGy', alpha=1)
     plt.axis(aspect='image')
 
-    plt.plot(w_list, e_bias_left(w_list), "k")
-    plt.plot(w_list, e_bias_right(w_list), "k")
+
+    #plt.plot(w_list, e_bias_left(w_list), "k")
+    #plt.plot(w_list, e_bias_right(w_list), "k")
     plt.ylim(0, 10)
 
     plt.tick_params(top=True, right=True)
@@ -151,6 +153,7 @@ def plot_plane():
     cb.ax.set_title("$\partial_W n$", size=14)
     cb.ax.tick_params(labelsize='large')
 
+    plt.axes().set_aspect(0.75)
     plt.show()
 
 
