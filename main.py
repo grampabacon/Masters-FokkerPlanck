@@ -13,11 +13,11 @@ import inputs.parameters as param
 # Theta for averaging over phase.
 theta_divisions = 1000
 thetas = np.linspace(0, np.pi, theta_divisions + 1)
-d_theta = (2 * np.pi) / theta_divisions
+d_theta = np.pi / theta_divisions
 
 # Range of mechanical energies for plotting
 energy_min = 0
-energy_max = 20000000
+energy_max = 2000000
 energy_divisions = 10000
 mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions + 1)
 d_energy = (energy_max - energy_min) / energy_divisions
@@ -33,12 +33,12 @@ def fermi_distribution(energy):
     return 1 / (1 + np.exp(energy / param.kT))
 
 
-def fermi_distribution_derivative_wrt_w_left(mechanical_energy):
-    return (- np.exp(- energy_change_plus_left(mechanical_energy) / param.kT) / param.kT) * (fermi_distribution(- energy_change_plus_left(mechanical_energy)) ** 2)
-
-
-def fermi_distribution_derivative_wrt_w_right(mechanical_energy):
-    return (- np.exp(- energy_change_plus_right(mechanical_energy) / param.kT) / param.kT) * (fermi_distribution(- energy_change_plus_right(mechanical_energy)) ** 2)
+# def fermi_distribution_derivative_wrt_w_left(mechanical_energy):
+#     return (- np.exp(- energy_change_plus_left(mechanical_energy) / param.kT) / param.kT) * (fermi_distribution(- energy_change_plus_left(mechanical_energy)) ** 2)
+#
+#
+# def fermi_distribution_derivative_wrt_w_right(mechanical_energy):
+#     return (- np.exp(- energy_change_plus_right(mechanical_energy) / param.kT) / param.kT) * (fermi_distribution(- energy_change_plus_right(mechanical_energy)) ** 2)
 
 
 # Energy changes
@@ -79,27 +79,52 @@ def gamma_minus_right(mechanical_energy):
     return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(mechanical_energy)) * (fermi_distribution(energy_change_minus_right(mechanical_energy)))
 
 
-# Tunneling rate derivatives
-def gamma_plus_derivative_dw_left(mechanical_energy):
-    return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(mechanical_energy)) * (param.tunneling_exponent_left
-                                                                                                                               - param.tunneling_exponent_left * fermi_distribution(- energy_change_plus_left(mechanical_energy))
-                                                                                                                               - fermi_distribution_derivative_wrt_w_left(mechanical_energy))
+# # Tunneling rate derivatives
+# def gamma_plus_derivative_dw_left(mechanical_energy):
+#     return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(mechanical_energy)) * (param.tunneling_exponent_left
+#                                                                                                                                - param.tunneling_exponent_left * fermi_distribution(- energy_change_plus_left(mechanical_energy))
+#                                                                                                                                - fermi_distribution_derivative_wrt_w_left(mechanical_energy))
+#
+#
+# def gamma_plus_derivative_dw_right(mechanical_energy):
+#     return 2 * param.gamma_zero_right * np.exp(- param.tunneling_exponent_right * energy_change_plus_right(mechanical_energy)) * (param.tunneling_exponent_right
+#                                                                                                                                   - param.tunneling_exponent_right * fermi_distribution(- energy_change_plus_right(mechanical_energy))
+#                                                                                                                                   - fermi_distribution_derivative_wrt_w_right(mechanical_energy))
+#
+#
+# def gamma_minus_derivative_dw_left(mechanical_energy):
+#     return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(mechanical_energy)) * (param.tunneling_exponent_left * fermi_distribution(energy_change_minus_left(mechanical_energy))
+#                                                                                                                           + fermi_distribution_derivative_wrt_w_left(mechanical_energy))
+#
+#
+# def gamma_minus_derivative_dw_right(mechanical_energy):
+#     return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(mechanical_energy)) * (param.tunneling_exponent_right * fermi_distribution(energy_change_minus_right(mechanical_energy))
+#                                                                                                                              + fermi_distribution_derivative_wrt_w_right(mechanical_energy))
 
 
-def gamma_plus_derivative_dw_right(mechanical_energy):
-    return 2 * param.gamma_zero_right * np.exp(- param.tunneling_exponent_right * energy_change_plus_right(mechanical_energy)) * (param.tunneling_exponent_right
-                                                                                                                                  - param.tunneling_exponent_right * fermi_distribution(- energy_change_plus_right(mechanical_energy))
-                                                                                                                                  - fermi_distribution_derivative_wrt_w_right(mechanical_energy))
+# Derivatives of the tunneling rate with respect to W
+def d_gamma_plus_left(mechanical_energy):
+    return 2 * param.gamma_zero_left * np.exp((param.tunneling_exponent_left + (1 / param.kT)) * energy_change_minus_left(mechanical_energy)) * (param.tunneling_exponent_left + param.tunneling_exponent_left *
+                                                                                                                                                 np.exp(energy_change_minus_left(mechanical_energy) / param.kT) +
+                                                                                                                                                 (1 / param.kT)) * (fermi_distribution(energy_change_minus_left(mechanical_energy)) ** 2)
 
 
-def gamma_minus_derivative_dw_left(mechanical_energy):
-    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(mechanical_energy)) * (param.tunneling_exponent_left * fermi_distribution(energy_change_minus_left(mechanical_energy))
-                                                                                                                          + fermi_distribution_derivative_wrt_w_left(mechanical_energy))
+def d_gamma_plus_right(mechanical_energy):
+    return 2 * param.gamma_zero_right * np.exp((param.tunneling_exponent_right + (1 / param.kT)) * energy_change_minus_right(mechanical_energy)) * (param.tunneling_exponent_right + param.tunneling_exponent_right *
+                                                                                                                                                    np.exp(energy_change_minus_right(mechanical_energy) / param.kT) +
+                                                                                                                                                    (1 / param.kT)) * (fermi_distribution(energy_change_minus_right(mechanical_energy)) ** 2)
 
 
-def gamma_minus_derivative_dw_right(mechanical_energy):
-    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(mechanical_energy)) * (param.tunneling_exponent_right * fermi_distribution(energy_change_minus_right(mechanical_energy))
-                                                                                                                             + fermi_distribution_derivative_wrt_w_right(mechanical_energy))
+def d_gamma_minus_left(mechanical_energy):
+    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(mechanical_energy)) * (param.tunneling_exponent_left + (param.tunneling_exponent_left - (1 / param.kT)) *
+                                                                                                                          np.exp(energy_change_minus_left(mechanical_energy) / param.kT)) * (
+                                                                                                                          fermi_distribution(energy_change_minus_left(mechanical_energy)) ** 2)
+
+
+def d_gamma_minus_right(mechanical_energy):
+    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(mechanical_energy)) * (param.tunneling_exponent_right + (param.tunneling_exponent_right - (1 / param.kT)) *
+                                                                                                                             np.exp(energy_change_minus_right(mechanical_energy) / param.kT)) * (
+                                                                                                                             fermi_distribution(energy_change_minus_right(mechanical_energy)) ** 2)
 
 
 # Total on and off tunneling rates
@@ -113,11 +138,11 @@ def gamma_minus(mechanical_energy):
 
 # Total on and off tunneling rate derivatives
 def gamma_plus_derivative_dw(mechanical_energy):
-    return gamma_plus_derivative_dw_left(mechanical_energy) + gamma_plus_derivative_dw_right(mechanical_energy)
+    return d_gamma_plus_left(mechanical_energy) + d_gamma_plus_right(mechanical_energy)
 
 
 def gamma_minus_derivative_dw(mechanical_energy):
-    return gamma_minus_derivative_dw_left(mechanical_energy) + gamma_minus_derivative_dw_right(mechanical_energy)
+    return d_gamma_minus_left(mechanical_energy) + d_gamma_minus_right(mechanical_energy)
 
 
 # Total tunneling rates
@@ -164,7 +189,7 @@ def kappa():
         dn = average_occupation_derivative_dw(mechanical_energies[i])
         gamma_t = gamma_total(mechanical_energies[i])
 
-        _k = ((np.cos(thetas) ** 2) / (2 * np.pi)) * (dn / gamma_t)
+        _k = ((np.cos(thetas) ** 2) / np.pi) * (dn / gamma_t)
         # k_right = _k[1:]
         # k_left = _k[:-1]
         # k = (param.oscillator_frequency / param.quality_factor) + ((param.coupling_force * param.coupling_force / param.oscillator_mass)

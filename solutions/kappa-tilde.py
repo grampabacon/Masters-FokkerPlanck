@@ -5,8 +5,12 @@ import inputs.parameters as param
 
 mechanical_energy = 0
 
-w_list = np.linspace(-5, 5, 2000)
-e_bias_list = np.linspace(0, 10, 2000)
+theta_divisions = 200
+theta_list = np.linspace(0, np.pi, theta_divisions)
+d_theta = np.pi / theta_divisions
+
+w_list = np.linspace(-5, 5, 200)
+e_bias_list = np.linspace(0, 10, 200)
 w_mesh, bias_mesh = np.meshgrid(w_list, e_bias_list)
 
 gate_capacitance = 0  # 10e-15
@@ -21,7 +25,7 @@ def fermi_distribution(energy_change):
 
 # Calculates oscillator transverse displacement using the mechanical energy of the oscillator
 def displacement():
-    return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass)
+    return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass) * np.sin(theta_list)
 
 
 # Changes in energy available for tunneling after an electron tunnels on or off the island from the left or the right
@@ -127,23 +131,22 @@ def e_bias_right(w):
     return (total_capacitance() / left_capacitance) * (w + (param.coupling_force * displacement() / param.W_c) - (const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c * total_capacitance())))
 
 
-# def kappa_tilde(w, e_bias):
-#     kappa_tilde_mesh = np.ndarray((len(w_list), len(e_bias_list)))
-#
-#     dn = d_n(w, e_bias, True)
-#     print(dn)
-#     gamma_t = gamma_total(w, e_bias, True)
-#
-#     for i in range(len(w_list)):
-#         for j in range(len(e_bias_list)):
-#             _term = dn[i][j] / gamma_t[i][j]
-#             _k = ((np.cos(theta_mesh) ** 2) / np.pi) * (dn / gamma_t)
-#
-#             k = np.trapz(_k, dx=d_theta)
-#             k *= (param.coupling_force * param.coupling_force / param.oscillator_mass)
-#
-#             kappa_tilde_mesh[i][j] = k
-#     return kappa_tilde_mesh
+def kappa_tilde(w, e_bias):
+    kappa_tilde_mesh = np.ndarray((len(w_list), len(e_bias_list)))
+
+    for i in range(len(w_list)):
+        for j in range(len(e_bias_list)):
+            dn = d_n(w[i][j], e_bias[i][j])
+            gamma_t = gamma_total(w[i][j], e_bias[i][j])
+
+            _term = dn / gamma_t
+            _k = ((np.cos(theta_list) ** 2) / np.pi) * (dn / gamma_t)
+
+            k = np.trapz(_k, dx=d_theta)
+            k *= (param.coupling_force * param.coupling_force / param.oscillator_mass)
+
+            kappa_tilde_mesh[i][j] = k
+    return kappa_tilde_mesh
 
 
 def plot_dn_dw():
@@ -178,4 +181,36 @@ def plot_dn_dw():
     fig.show()
 
 
-plot_dn_dw()
+def plot_kappa_tilde():
+    kt = kappa_tilde(w_mesh, bias_mesh)
+
+    fig, ax = plt.subplots()
+
+    # ax.imshow(dn, extent=[-5, 5, 0, 10], origin='lower', cmap='RdGy', alpha=1)
+    # im = ax.imshow(dn, extent=[-5, 5, 0, 10], origin='lower', cmap='coolwarm', alpha=1)
+    # ax.axis(aspect='image')
+
+    im = ax.contourf(w_mesh, bias_mesh, kt, 20, cmap='coolwarm')
+    ax.contour(w_mesh, bias_mesh, kt, 1, colors='black', levels=[0], linestyles='dashed')
+
+    ax.plot(w_list, e_bias_left(w_list), "k")
+    ax.plot(w_list, e_bias_right(w_list), "k")
+    plt.ylim(0, 10)
+
+    ax.tick_params(top=True, right=True)
+    ax.tick_params(axis='x', direction='in', length=6, labelsize=12)
+    ax.tick_params(axis='y', direction='in', length=6, labelsize=12)
+
+    ax.xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+    ax.yaxis.set_label_text("$e V_b$ (units of $W_c$)", fontsize=14)
+
+    cb = fig.colorbar(im, orientation='vertical')
+    cb.set_label("$\partial_W n$", size=14)
+    # cb.ax.set_title("$\partial_W n$", size=14)
+    cb.ax.tick_params(labelsize='large')
+
+    ax.set_aspect(0.75)
+    fig.show()
+
+
+plot_kappa_tilde()
