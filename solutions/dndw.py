@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import inputs.constants as const
 import inputs.parameters as param
 
-mechanical_energy = 0
+mechanical_energy = 1000
 
 w_list = np.linspace(-5, 5, 2000)
 e_bias_list = np.linspace(0, 10, 2000)

@@ -131,8 +131,8 @@ def e_bias_right(w):
     return (total_capacitance() / left_capacitance) * (w + (param.coupling_force * displacement() / param.W_c) - (const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c * total_capacitance())))
 
 
-def kappa_tilde(w, e_bias):
-    kappa_tilde_mesh = np.ndarray((len(w_list), len(e_bias_list)))
+def kappa_tilde_mesh(w, e_bias):
+    kappa_tilde_m = np.ndarray((len(w_list), len(e_bias_list)))
 
     for i in range(len(w_list)):
         for j in range(len(e_bias_list)):
@@ -145,8 +145,25 @@ def kappa_tilde(w, e_bias):
             k = np.trapz(_k, dx=d_theta)
             k *= (param.coupling_force * param.coupling_force / param.oscillator_mass)
 
-            kappa_tilde_mesh[i][j] = k
-    return kappa_tilde_mesh
+            kappa_tilde_m[i][j] = k
+    return kappa_tilde_m
+
+
+def kappa_tilde_bias_slice(w, e_bias):
+    kappa_tilde_b = np.ndarray(len(w_list))
+
+    for i in range(len(w_list)):
+        dn = d_n(w[i], e_bias)
+        gamma_t = gamma_total(w[i], e_bias)
+
+        _term = dn / gamma_t
+        _k = ((np.cos(theta_list) ** 2) / np.pi) * (dn / gamma_t)
+
+        k = np.trapz(_k, dx=d_theta)
+        k *= (param.coupling_force * param.coupling_force / param.oscillator_mass)
+
+        kappa_tilde_b[i] = k
+    return kappa_tilde_b
 
 
 def plot_dn_dw():
@@ -173,8 +190,8 @@ def plot_dn_dw():
     ax.yaxis.set_label_text("$e V_b$ (units of $W_c$)", fontsize=14)
 
     cb = fig.colorbar(im, orientation='vertical')
-    # cb.set_label("$\partial_W n$", size=14)
-    cb.ax.set_title("$\partial_W n$", size=14)
+    cb.set_label("$\partial_W n$", size=14)
+    # cb.ax.set_title("$\partial_W n$", size=14)
     cb.ax.tick_params(labelsize='large')
 
     ax.set_aspect(0.75)
@@ -182,7 +199,7 @@ def plot_dn_dw():
 
 
 def plot_kappa_tilde():
-    kt = kappa_tilde(w_mesh, bias_mesh)
+    kt = kappa_tilde_mesh(w_mesh, bias_mesh)
 
     fig, ax = plt.subplots()
 
@@ -205,7 +222,7 @@ def plot_kappa_tilde():
     ax.yaxis.set_label_text("$e V_b$ (units of $W_c$)", fontsize=14)
 
     cb = fig.colorbar(im, orientation='vertical')
-    cb.set_label("$\partial_W n$", size=14)
+    cb.set_label("$\kappa$-tilde", size=14)
     # cb.ax.set_title("$\partial_W n$", size=14)
     cb.ax.tick_params(labelsize='large')
 
@@ -213,4 +230,30 @@ def plot_kappa_tilde():
     fig.show()
 
 
-plot_kappa_tilde()
+def plot_kappa_tilde_dn_dw_bias_slice():
+    kt = kappa_tilde_bias_slice(w_list, 6)
+    #kt = kt / np.linalg.norm(kt)
+    dn = d_n(w_list, 6)
+    #dn = dn / np.linalg.norm(dn)
+
+    fig, ax1 = plt.subplots()
+
+    color = 'tab:red'
+    ax1.set_xlabel('$W$ (units of $W_c$)', fontsize=14)
+    ax1.set_ylabel('$\kappa$-tilde ($s^{-1}$)', color=color, fontsize=14)
+    ax1.plot(w_list, kt, color=color)
+    ax1.tick_params(axis='y', labelcolor=color, labelsize=12)
+
+    ax2 = ax1.twinx()
+
+    color = 'tab:blue'
+    ax2.set_ylabel('$\partial_W n$ ($W_c^{-1}$)', color=color, fontsize=14)
+    ax2.plot(w_list, dn, color=color)
+    ax2.tick_params(axis='y', labelcolor=color, labelsize=12)
+
+    ax1.set_title("Comparing $\partial_W n$ and $\kappa$-tilde for $e V_b = 6 W_c$", fontsize=14)
+    plt.tight_layout()
+    fig.show()
+
+
+plot_kappa_tilde_dn_dw_bias_slice()

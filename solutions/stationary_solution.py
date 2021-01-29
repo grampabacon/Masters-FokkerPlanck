@@ -198,11 +198,11 @@ def normalise(probs):
 
 def plot_prob():
     param.W = 2
-    bias = 6 / const.ELEMENTARY_CHARGE
+    bias = 9 / const.ELEMENTARY_CHARGE
     param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
     param.W_R = w_right(bias)
 
-    plt.plot(main.mechanical_energies, normalise(np.exp(perform_stationary_integral(stationary_integrand()))), "k")
+    plt.plot(main.mechanical_energies, (np.exp(perform_stationary_integral(stationary_integrand()))), "k")
     plt.xlabel("Energy / W_c")
     plt.ylabel("P(E)")
     plt.title("$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$, $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$", y=1.08)
@@ -265,4 +265,4 @@ def w_right(bias):
 
 # plot_regions_seperate_graphs()
 print(find_roots())
-plot_kappa()
+plot_prob()
