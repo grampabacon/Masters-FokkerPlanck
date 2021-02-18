@@ -112,19 +112,19 @@ def total_capacitance():
 
 
 def w_left(e_bias):
-    return (1 / total_capacitance()) * ((const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c)) - (right_capacitance * e_bias)) - (param.coupling_force * displacement() / param.W_c)
+    return (1 / total_capacitance()) * ((const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c)) - (right_capacitance * e_bias))
 
 
 def w_right(e_bias):
-    return (1 / total_capacitance()) * ((const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c)) + (left_capacitance * e_bias)) - (param.coupling_force * displacement() / param.W_c)
+    return (1 / total_capacitance()) * ((const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c)) + (left_capacitance * e_bias))
 
 
 def e_bias_left(w):
-    return (total_capacitance() / right_capacitance) * ((const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c * total_capacitance())) - w - (param.coupling_force * displacement() / param.W_c))
+    return (total_capacitance() / right_capacitance) * ((const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c * total_capacitance())) - w)
 
 
 def e_bias_right(w):
-    return (total_capacitance() / left_capacitance) * (w + (param.coupling_force * displacement() / param.W_c) - (const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c * total_capacitance())))
+    return (total_capacitance() / left_capacitance) * (w - (const.ELEMENTARY_CHARGE ** 2 / (2 * param.W_c * total_capacitance())))
 
 
 # def kappa_tilde(w, e_bias):

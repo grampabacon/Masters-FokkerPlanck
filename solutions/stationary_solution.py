@@ -1,9 +1,12 @@
 import main
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpl_patches
 import math
 import inputs.constants as const
 import inputs.parameters as param
+mpl.use('Qt5Agg')
 
 ################################################
 #                                              #
@@ -18,9 +21,9 @@ right_capacitance = 10e-15
 
 
 # Calculating the integrals
-def stationary_integrand():
+def stationary_integrand(kappas):
     # return (-main.mechanical_energies * main.kappa()) / main.diffusion()
-    return - main.kappa() / main.diffusion()
+    return - kappas / main.diffusion()
 
 
 def perform_stationary_integral(integrands):
@@ -189,55 +192,81 @@ colors = ["r-", "b-", "g-", "m-", "c-", "y-", "k-", "r--", "b--", "g--", "m--"]
 
 
 def normalise(probs):
-    # s = np.linalg.norm(probs)
-    s = np.sum(probs)
-    print(s)
+    s = np.linalg.norm(probs)
+    # s = np.sum(probs)
+    # s = np.trapz(probs, main.mechanical_energies)
+    print("Normalisation constant: " + str(s))
     normed = probs / s
     return normed
 
 
-def plot_prob():
-    param.W = 2
-    bias = 9 / const.ELEMENTARY_CHARGE
-    param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
-    param.W_R = w_right(bias)
+def plot_prob(bias, kappas):
+    # param.W = 2
+    # bias = 9 / const.ELEMENTARY_CHARGE
+    # param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    # param.W_R = w_right(bias)
 
-    plt.plot(main.mechanical_energies, (np.exp(perform_stationary_integral(stationary_integrand()))), "k")
+    plot1 = plt.figure("Probability")
+    plt.plot(main.mechanical_energies, normalise(np.exp(perform_stationary_integral(stationary_integrand(kappas)))), "k")
+
     plt.xlabel("Energy / W_c")
     plt.ylabel("P(E)")
-    plt.title("$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$, $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$", y=1.08)
+    plt.title("$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$, $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$", y=1.03)
+
+    roots = find_roots(kappas)
+
+    handles = [mpl_patches.Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="white", linewidth=0, alpha=0)]
+    labels = ["Extrema at: [" + ", ".join(map(str, roots)) + "]$W_c$"]
+    plt.legend(handles, labels, loc='best', fontsize='large', fancybox=True, framealpha=0.7, handlelength=0, handletextpad=0)
+
+    filename = "Probability W=" + str(round(param.W, 1)) + ", eVb=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + ", WL=" + str(round(param.W_L, 1)) + ", WR=" + str(round(param.W_R, 1)) + ".png"
+    plt.savefig("../out/" + filename, bbox_inches='tight')
+    print("Saved: " + filename)
 
     plt.show()
 
 
-def plot_kappa():
-    param.W = 2  # * param.W_c
-    bias = 9 / const.ELEMENTARY_CHARGE
-    param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
-    param.W_R = w_right(bias)
+def plot_kappa(bias, kappas):
+    # param.W = 2  # * param.W_c
+    # bias = 9 / const.ELEMENTARY_CHARGE
+    # param.W_L = w_left(bias)  # - const.ELEMENTARY_CHARGE * bias_voltage / 2
+    # param.W_R = w_right(bias)
 
-    kappas = main.kappa()
-
+    plot2 = plt.figure("Kappa")
     plt.plot(main.mechanical_energies, kappas, "k")
     plt.axhline(y=0, color='k', linewidth=0.5, label='_nolegend_')
+
     plt.xlabel("Energy / W_c")
     plt.ylabel("Kappa / Hz")
     plt.title(
-        "$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$; $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$, Min($\kappa$)=%.2f" % np.amin(
-            kappas), y=1.08)
+        "$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$; $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)), y=1.03)
+
+    roots = find_roots(kappas)
+    # for i in range(len(roots)):
+    #     plt.axvline(roots[i], color='r')
+
+    handles = [mpl_patches.Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="white", linewidth=0, alpha=0)]
+    labels = []
+    if len(roots) == 1 and roots[0] == 0:
+        labels.append("No roots.")
+    else:
+        labels.append("Roots: [" + ", ".join(map(str, roots)) + "]$W_c$")
+    plt.legend(handles, labels, loc='best', fontsize='large', fancybox=True, framealpha=0.7, handlelength=0, handletextpad=0)
+
+    filename = "Kappa W=" + str(round(param.W, 1)) + ", eVb=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + ", WL=" + str(round(param.W_L, 1)) + ", WR=" + str(round(param.W_R, 1)) + ".png"
+    plt.savefig("../out/" + filename, bbox_inches='tight')
+    print("Saved: " + filename)
+
     plt.show()
 
 
-def find_roots():
-    param.W = 2
-    bias = 9 / const.ELEMENTARY_CHARGE
-    param.W_L = w_left(bias)
-    param.W_R = w_right(bias)
+def find_roots(kappas):
+    # param.W = 2
+    # bias = 9 / const.ELEMENTARY_CHARGE
+    # param.W_L = w_left(bias)
+    # param.W_R = w_right(bias)
 
-    kappas = main.kappa()
-    arr = main.mechanical_energies * kappas
-
-    signs = np.sign(arr)
+    signs = np.sign(kappas)
     roots = []
 
     for i in range(len(signs)):
@@ -246,9 +275,11 @@ def find_roots():
             continue
         if (i + 1) < len(signs):
             if signs[i + 1] != signs[i]:
-                roots.append((i + (i + 1) / 2) * main.d_energy)
+                roots.append(i * main.d_energy)
                 continue
-    return roots
+    if not roots:
+        roots.append(0)
+    return np.around(roots, 1)
 
 
 def total_capacitance():
@@ -263,6 +294,29 @@ def w_right(bias):
     return (const.ELEMENTARY_CHARGE ** 2 / total_capacitance()) * ((1 / (2 * param.W_c)) + (left_capacitance * bias / const.ELEMENTARY_CHARGE))
 
 
-# plot_regions_seperate_graphs()
-print(find_roots())
-plot_prob()
+def plot_kappa_single(w, e_bias):
+    param.W = w
+    bias = e_bias / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)
+    param.W_R = w_right(bias)
+
+    kappas = main.kappa()
+
+    plot_kappa(bias, kappas)
+
+
+# Plot the main graphs and data related to P(E). This plot will print the roots where the maxima of the probability function are located and the kappa(E) of the output P(E).
+def plot_graphs(w, e_bias):
+    param.W = w
+    bias = e_bias / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)
+    param.W_R = w_right(bias)
+
+    kappas = main.kappa()
+
+    plot_kappa(bias, kappas)
+    plot_prob(bias, kappas)
+
+
+# plot_graphs(-0.8, 3)
+plot_kappa_single(-0.9292, 3.72345)
