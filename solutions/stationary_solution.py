@@ -247,7 +247,7 @@ def plot_kappa(bias, kappas):
 
     handles = [mpl_patches.Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="white", linewidth=0, alpha=0)]
     labels = []
-    if len(roots) == 1 and roots[0] == 0:
+    if len(roots) == 0:
         labels.append("No roots.")
     else:
         labels.append("Roots: [" + ", ".join(map(str, roots)) + "]$W_c$")
@@ -319,4 +319,4 @@ def plot_graphs(w, e_bias):
 
 
 # plot_graphs(-0.8, 3)
-plot_kappa_single(-0.9292, 3.72345)
+plot_graphs(-0.9, 3.64)

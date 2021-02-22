@@ -5,9 +5,9 @@ import matplotlib.colors as colors
 import inputs.constants as const
 import inputs.parameters as param
 
-mechanical_energy = 1000
+mechanical_energy = 1200
 
-theta_divisions = 300
+theta_divisions = 200
 theta_list = np.linspace(0, np.pi, theta_divisions)
 d_theta = np.pi / theta_divisions
 
@@ -218,12 +218,9 @@ def plot_kappa_tilde():
     zero_contour = im.collections[0].get_paths()[0].vertices
     minimum = zero_contour[np.argmin(zero_contour, axis=0)[1]]
 
-    label = "(" f'{float(f"{minimum[0]:.3g}"):g}' + ", " + f'{float(f"{minimum[1]:.3g}"):g}' + ")"
+    label_min = "(" f'{float(f"{minimum[0]:.3g}"):g}' + ", " + f'{float(f"{minimum[1]:.3g}"):g}' + ")"
     ax.plot(minimum[0], minimum[1], "wp")
     # ax.annotate(label, (minimum[0], minimum[1]), textcoords="offset points", xytext=(1, -12), ha="center")
-
-    handles = [mlines.Line2D([], [], color='w', marker='p', markersize=6, linewidth=0, markeredgecolor='black')]
-    ax.legend(handles, [label], loc='lower right')
 
     ax.plot(w_list, e_bias_left(w_list), "k")
     ax.plot(w_list, e_bias_right(w_list), "k")
@@ -231,7 +228,12 @@ def plot_kappa_tilde():
 
     ax.axhline(8, linestyle='solid', color='g', linewidth=0.3)
     # points = ax.plot([-2, -1.3, -0.5, 1], [4, 4, 4, 4], 'gs')
-    point = ax.plot(-2.4, 8, 'gx')
+    x, y = -2.4, 8
+    point_label = "(" + str(x) + ", " + str(y) + ")"
+    point = ax.plot(x, y, 'gx')
+
+    handles = [mlines.Line2D([], [], color='w', marker='p', markersize=6, linewidth=0, markeredgecolor='black'), mlines.Line2D([], [], color='g', marker='x', markersize=6, linewidth=0)]
+    ax.legend(handles, [label_min, point_label], loc='lower right')
 
     ax.tick_params(top=True, right=True)
     ax.tick_params(axis='x', direction='in', length=6, labelsize=12)
@@ -249,7 +251,7 @@ def plot_kappa_tilde():
 
     ax.set_aspect(0.75)
 
-    filename = "KappaDensity " + f"E={mechanical_energy}Wc. Min+Mark" + ".png"
+    filename = "KappaDensity " + f"E={mechanical_energy}Wc. Min. Marked " + point_label + ".png"
     plt.savefig("../out/" + filename, bbox_inches='tight')
     print("Saved: " + filename)
 
@@ -271,7 +273,7 @@ def plot_kappa_tilde_symmetric():
 
     divnorm = colors.TwoSlopeNorm(vcenter=0)
 
-    im = ax.contourf(w_mesh2, bias_mesh2, kt2, 20, cmap='plasma', norm=divnorm) # Maybe plasma, viridis
+    im = ax.contourf(w_mesh2, bias_mesh2, kt2, 20, cmap='plasma', norm=divnorm)  # Maybe plasma, viridis
     ax.contour(w_mesh2, bias_mesh2, kt2, 1, colors='black', levels=[0], linestyles='dashed')
 
     ax.plot(w_list, e_bias_left(w_list), "k")
@@ -299,9 +301,9 @@ def plot_kappa_tilde_symmetric():
 
 def plot_kappa_tilde_dn_dw_bias_slice():
     kt = kappa_tilde_bias_slice(w_list, 6)
-    #kt = kt / np.linalg.norm(kt)
+    # kt = kt / np.linalg.norm(kt)
     dn = d_n(w_list, 6)
-    #dn = dn / np.linalg.norm(dn)
+    # dn = dn / np.linalg.norm(dn)
 
     fig, ax1 = plt.subplots()
 
@@ -376,8 +378,11 @@ def plot_kappa_tilde_region_iii():
     _kt = np.sign(kt0)
 
     sign_changes = np.zeros((len(w_list), len(e_bias_list)))
-    for i in range(250):
-        mechanical_energy = (i + 1) * 20
+
+    count = 15
+    d_energy = 80
+    for i in range(count):
+        mechanical_energy = (i + 1) * d_energy
 
         kt = np.sign(kappa_tilde_mesh(w_mesh, bias_mesh))
         for j in range(len(w_list)):
@@ -404,8 +409,8 @@ def plot_kappa_tilde_region_iii():
 
     regions = ax.contourf(w_mesh, bias_mesh, sign_changes, 20, cmap=cmapblue)
 
-    ax.axhline(3, linestyle='solid', color='g', linewidth=0.3)
-    point = ax.plot([-2, -1.3, -0.5, 1], [3, 3, 3, 3], 'gs')
+    ax.axhline(6, linestyle='solid', color='g', linewidth=0.3)
+    point = ax.plot([-2.7, -2.3, -1.57, 1.6], [6, 6, 6, 6], 'gs')
 
     ax.plot(w_list, e_bias_left(w_list), "k")
     ax.plot(w_list, e_bias_right(w_list), "k")
@@ -433,7 +438,151 @@ def plot_kappa_tilde_region_iii():
     cb.ax.tick_params(labelsize='large')
 
     ax.set_aspect(0.75)
+
+    E = count * d_energy
+    filename = "RegioniiiKappaDensity " + f"Emax={E}Wc.png"
+    plt.savefig("../out/" + filename, bbox_inches='tight')
+    print("Saved: " + filename)
+
     fig.show()
 
 
-plot_kappa_tilde()
+def save_kappa_tilde_region_iii_data():
+    global mechanical_energy
+
+    mechanical_energy = 0
+    kt0 = kappa_tilde_mesh(w_mesh, bias_mesh)
+
+    _kt = np.sign(kt0)
+
+    sign_changes = np.zeros((len(w_list), len(e_bias_list)))
+
+    count = 60
+    d_energy = 50
+    for i in range(count):
+        mechanical_energy = (i + 1) * d_energy
+
+        kt = np.sign(kappa_tilde_mesh(w_mesh, bias_mesh))
+        for j in range(len(w_list)):
+            for k in range(len(e_bias_list)):
+                if _kt[j][k] != kt[j][k]:
+                    sign_changes[j][k] += 1
+        _kt = kt
+    for j in range(len(w_list)):
+        for k in range(len(e_bias_list)):
+            if sign_changes[j][k] == 0:
+                continue
+            if sign_changes[j][k] == 1:
+                sign_changes[j][k] = 0
+
+    blue_colors = [(0, 0, 1, c) for c in np.linspace(0, 1, 100)]
+    cmapblue = colors.LinearSegmentedColormap.from_list('mycmap', blue_colors, N=(np.amax(sign_changes) + 1))
+
+    fig, ax = plt.subplots(num='Region iii')
+
+    divnorm = colors.TwoSlopeNorm(vcenter=0)
+
+    im = ax.contourf(w_mesh, bias_mesh, kt0, 20, cmap='plasma', norm=divnorm)  # Maybe plasma, viridis
+    ax.contour(w_mesh, bias_mesh, kt0, 1, colors='black', levels=[0], linestyles='dashed')
+
+    regions = ax.contourf(w_mesh, bias_mesh, sign_changes, 20, cmap=cmapblue)
+
+    ax.axhline(6, linestyle='solid', color='g', linewidth=0.3)
+    point = ax.plot([-2.7, -2.3, -1.57, 1.6], [6, 6, 6, 6], 'gs')
+
+    ax.plot(w_list, e_bias_left(w_list), "k")
+    ax.plot(w_list, e_bias_right(w_list), "k")
+    plt.ylim(0, 10)
+
+    # handles = [mlines.Line2D([], [], color='m', marker='x', markersize=6, linewidth=0)]
+    # ax.legend(handles, ["(" + str(x) + ", " + str(y) + ")"], loc='lower right')
+
+    ax.tick_params(top=True, right=True)
+    ax.tick_params(axis='x', direction='in', length=6, labelsize=12)
+    ax.tick_params(axis='y', direction='in', length=6, labelsize=12)
+
+    ax.xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+    ax.yaxis.set_label_text("$e V_b$ (units of $W_c$)", fontsize=14)
+
+    # ax.set_title("Mechanical Energy: " + str(mechanical_energy) + "$W_c$")
+
+    cb_regions = fig.colorbar(regions, ticks=np.linspace(0, 5, 6))
+    cb_regions.set_label("Roots")
+    cb_regions.ax.tick_params(labelsize='large')
+
+    cb = fig.colorbar(im, orientation='vertical')
+    cb.set_label("$\kappa$-tilde", size=14)
+    # cb.ax.set_title("$\partial_W n$", size=14)
+    cb.ax.tick_params(labelsize='large')
+
+    ax.set_aspect(0.75)
+
+    energy_max = count * d_energy
+    data_name = "regioniii_data_" + f"Emax={energy_max}"
+    np.save("../data/" + data_name, sign_changes)
+
+    filename = "RegioniiiKappaDensity " + f"Emax={energy_max}Wc.png"
+    plt.savefig("../out/" + filename, bbox_inches='tight')
+    print("Saved: " + filename)
+
+    fig.show()
+
+
+def plot_kappa_tilde_region_iii_from_data():
+    global mechanical_energy
+
+    mechanical_energy = 0
+    kt0 = kappa_tilde_mesh(w_mesh, bias_mesh)
+
+    sign_changes = np.load("../data/regioniii_data_Emax=3000.npy")
+
+    blue_colors = [(0, 0, 1, c) for c in np.linspace(0, 1, 100)]
+    cmapblue = colors.LinearSegmentedColormap.from_list('mycmap', blue_colors, N=(np.amax(sign_changes) + 1))
+
+    fig, ax = plt.subplots(num='Region iii')
+
+    divnorm = colors.TwoSlopeNorm(vcenter=0)
+
+    im = ax.contourf(w_mesh, bias_mesh, kt0, 20, cmap='plasma', norm=divnorm)  # Maybe plasma, viridis
+    ax.contour(w_mesh, bias_mesh, kt0, 1, colors='black', levels=[0], linestyles='dashed')
+
+    regions = ax.contourf(w_mesh, bias_mesh, sign_changes, 20, cmap=cmapblue)
+
+    ax.axhline(6, linestyle='solid', color='g', linewidth=0.3)
+    point = ax.plot([-2.7, -2.3, -1.95, -1.57, 1.6, 2.8], [6, 6, 6, 6, 6, 6], 'gs')
+
+    ax.plot(w_list, e_bias_left(w_list), "k")
+    ax.plot(w_list, e_bias_right(w_list), "k")
+    plt.ylim(0, 10)
+
+    # handles = [mlines.Line2D([], [], color='m', marker='x', markersize=6, linewidth=0)]
+    # ax.legend(handles, ["(" + str(x) + ", " + str(y) + ")"], loc='lower right')
+
+    ax.tick_params(top=True, right=True)
+    ax.tick_params(axis='x', direction='in', length=6, labelsize=12)
+    ax.tick_params(axis='y', direction='in', length=6, labelsize=12)
+
+    ax.xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+    ax.yaxis.set_label_text("$e V_b$ (units of $W_c$)", fontsize=14)
+
+    # ax.set_title("Mechanical Energy: " + str(mechanical_energy) + "$W_c$")
+
+    cb_regions = fig.colorbar(regions, ticks=np.linspace(0, 5, 6))
+    cb_regions.set_label("Roots")
+    cb_regions.ax.tick_params(labelsize='large')
+
+    cb = fig.colorbar(im, orientation='vertical')
+    cb.set_label("$\kappa$-tilde", size=14)
+    # cb.ax.set_title("$\partial_W n$", size=14)
+    cb.ax.tick_params(labelsize='large')
+
+    ax.set_aspect(0.75)
+
+    filename = "RegioniiiKappaDensity FromData3000.png"
+    plt.savefig("../out/" + filename, bbox_inches='tight')
+    print("Saved: " + filename)
+
+    fig.show()
+
+
+plot_kappa_tilde_region_iii_from_data()

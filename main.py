@@ -12,7 +12,7 @@ import inputs.parameters as param
 
 # Range of mechanical energies for plotting
 energy_min = 0
-energy_max = 5000
+energy_max = 50000
 energy_divisions = 10000
 mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions + 1)
 d_energy = (energy_max - energy_min) / energy_divisions
