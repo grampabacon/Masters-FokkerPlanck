@@ -5,9 +5,9 @@ import matplotlib.colors as colors
 import inputs.constants as const
 import inputs.parameters as param
 
-mechanical_energy = 0
+mechanical_energy = 6000
 
-theta_divisions = 200
+theta_divisions = 400
 theta_list = np.linspace(0, np.pi, theta_divisions)
 d_theta = np.pi / theta_divisions
 
@@ -19,10 +19,17 @@ gate_capacitance = 0  # 10e-15
 left_capacitance = 10e-15
 right_capacitance = 10e-15
 
+epsilon_zero = 0
+width = 0.1
+
 
 # Fermi-Dirac Distribution with \mu = 0
 def fermi_distribution(energy_change):
     return 1 / (1 + np.exp(energy_change / param.kT))
+
+
+def gaussian(energy_change):
+    return np.exp((energy_change - epsilon_zero) / width)
 
 
 # Calculates oscillator transverse displacement using the mechanical energy of the oscillator
@@ -48,16 +55,22 @@ def energy_change_minus_right(w, e_bias):
 
 
 # Tunneling rates
-def gamma_plus_left(w, e_bias):
-    return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(w, e_bias)) * (1 - fermi_distribution(- energy_change_plus_left(w, e_bias)))
+def gamma_plus_left_modified(w, e_bias):
+    return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(w, e_bias)) * (1 - fermi_distribution(- energy_change_plus_left(w, e_bias))) * gaussian(energy_change_minus_left(w, e_bias))
+
+
+def gamma_minus_left_modified(w, e_bias):
+    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (fermi_distribution(energy_change_minus_left(w, e_bias))) * gaussian(energy_change_minus_left(w, e_bias))
+
+
+# def gamma_plus_left(w, e_bias):
+#     return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(w, e_bias)) * (1 - fermi_distribution(- energy_change_plus_left(w, e_bias)))
+# def gamma_minus_left(w, e_bias):
+#     return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (fermi_distribution(energy_change_minus_left(w, e_bias)))
 
 
 def gamma_plus_right(w, e_bias):
     return 2 * param.gamma_zero_right * np.exp(- param.tunneling_exponent_right * energy_change_plus_right(w, e_bias)) * (1 - fermi_distribution(- energy_change_plus_right(w, e_bias)))
-
-
-def gamma_minus_left(w, e_bias):
-    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (fermi_distribution(energy_change_minus_left(w, e_bias)))
 
 
 def gamma_minus_right(w, e_bias):
@@ -65,10 +78,16 @@ def gamma_minus_right(w, e_bias):
 
 
 # Derivatives of the tunneling rate with respect to W
-def d_gamma_plus_left(w, e_bias):
-    return 2 * param.gamma_zero_left * np.exp((param.tunneling_exponent_left + (1 / param.kT)) * energy_change_minus_left(w, e_bias)) * (param.tunneling_exponent_left +
-                                                                                                                                         param.tunneling_exponent_left * np.exp(energy_change_minus_left(w, e_bias) / param.kT) +
-                                                                                                                                         (1 / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
+def d_gamma_plus_left_modified(w, e_bias):
+    return ((2 * param.gamma_zero_left) / width) * np.exp((- epsilon_zero + (1 + (param.tunneling_exponent_left + (1 / param.kT)) * width) * energy_change_minus_left(w, e_bias)) / width) \
+           * (1 + param.tunneling_exponent_left * width + (1 + param.tunneling_exponent_left * width) * np.exp(energy_change_minus_left(w, e_bias) / param.kT) + width * (1 / param.kT)) \
+           * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
+
+
+def d_gamma_minus_left_modified(w, e_bias):
+    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (param.tunneling_exponent_left +
+                                                                                                                  (param.tunneling_exponent_left - (1 / param.kT)) *
+                                                                                                                  np.exp(energy_change_minus_left(w, e_bias) / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
 
 
 def d_gamma_plus_right(w, e_bias):
@@ -77,32 +96,37 @@ def d_gamma_plus_right(w, e_bias):
                                                                                                                                             (1 / param.kT)) * (fermi_distribution(energy_change_minus_right(w, e_bias)) ** 2)
 
 
-def d_gamma_minus_left(w, e_bias):
-    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (param.tunneling_exponent_left +
-                                                                                                                  (param.tunneling_exponent_left - (1 / param.kT)) *
-                                                                                                                  np.exp(energy_change_minus_left(w, e_bias) / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
-
-
 def d_gamma_minus_right(w, e_bias):
     return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(w, e_bias)) * (param.tunneling_exponent_right +
                                                                                                                      (param.tunneling_exponent_right - (1 / param.kT)) *
                                                                                                                      np.exp(energy_change_minus_right(w, e_bias) / param.kT)) * (fermi_distribution(energy_change_minus_right(w, e_bias)) ** 2)
 
 
+# def d_gamma_plus_left(w, e_bias):
+#     return 2 * param.gamma_zero_left * np.exp((param.tunneling_exponent_left + (1 / param.kT)) * energy_change_minus_left(w, e_bias)) * (param.tunneling_exponent_left +
+#                                                                                                                                          param.tunneling_exponent_left * np.exp(energy_change_minus_left(w, e_bias) / param.kT) +
+#                                                                                                                                          (1 / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
+# def d_gamma_minus_left(w, e_bias):
+#     return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (param.tunneling_exponent_left +
+#                                                                                                                   (param.tunneling_exponent_left - (1 / param.kT)) *
+#                                                                                                                   np.exp(energy_change_minus_left(w, e_bias) / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
+
+
+
 def gamma_plus(w, e_bias):
-    return gamma_plus_left(w, e_bias) + gamma_plus_right(w, e_bias)
+    return gamma_plus_left_modified(w, e_bias) + gamma_plus_right(w, e_bias)
 
 
 def gamma_minus(w, e_bias):
-    return gamma_minus_left(w, e_bias) + gamma_minus_right(w, e_bias)
+    return gamma_minus_left_modified(w, e_bias) + gamma_minus_right(w, e_bias)
 
 
 def d_gamma_plus(w, e_bias):
-    return d_gamma_plus_left(w, e_bias) + d_gamma_plus_right(w, e_bias)
+    return d_gamma_plus_left_modified(w, e_bias) + d_gamma_plus_right(w, e_bias)
 
 
 def d_gamma_minus(w, e_bias):
-    return d_gamma_minus_left(w, e_bias) + d_gamma_minus_right(w, e_bias)
+    return d_gamma_minus_left_modified(w, e_bias) + d_gamma_minus_right(w, e_bias)
 
 
 def gamma_total(w, e_bias):

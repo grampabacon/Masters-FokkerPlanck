@@ -319,4 +319,4 @@ def plot_graphs(w, e_bias):
 
 
 # plot_graphs(-0.8, 3)
-plot_graphs(-0.9, 3.64)
+plot_graphs(-2.28, 6)
