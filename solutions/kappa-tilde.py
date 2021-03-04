@@ -558,6 +558,16 @@ def plot_kappa_tilde_region_iii_from_data():
     for i, txt in enumerate(ns):
         ax.annotate(txt, (xs[i], ys[i]), textcoords="offset points", xytext=(0, 6), ha="center", bbox=dict(boxstyle="circle,pad=0.05", fc=(1, 1, 1, 0.5), ec="none"))
 
+    ax.axhline(3, linestyle=(0, (5, 5)), color='g', linewidth=0.5)
+
+    xs1 = [-1.3, -0.94, -0.44, 0.64, 1.3]
+    ys1 = [3, 3, 3, 3, 3]
+    ns1 = ['i', 'ii', 'iii', 'iv', 'v']
+    points = ax.plot(xs1, ys1, 'g.')
+
+    for i, txt in enumerate(ns1):
+        ax.annotate(txt, (xs1[i], ys1[i]), textcoords="offset points", xytext=(0, 6), ha="center", bbox=dict(boxstyle="circle,pad=0.1", fc=(1, 1, 1, 0.5), ec="none"))
+
     ax.plot(w_list, e_bias_left(w_list), "k")
     ax.plot(w_list, e_bias_right(w_list), "k")
     plt.ylim(0, 10)
@@ -574,9 +584,9 @@ def plot_kappa_tilde_region_iii_from_data():
 
     # ax.set_title("Mechanical Energy: " + str(mechanical_energy) + "$W_c$")
 
-    cb_regions = fig.colorbar(regions, ticks=np.linspace(0, 5, 6))
-    cb_regions.set_label("Roots")
-    cb_regions.ax.tick_params(labelsize='large')
+    # cb_regions = fig.colorbar(regions, ticks=np.linspace(0, 5, 6))
+    # cb_regions.set_label("Roots")
+    # cb_regions.ax.tick_params(labelsize='large')
 
     cb = fig.colorbar(im, orientation='vertical')
     cb.set_label("$\kappa$-tilde", size=14)
@@ -592,4 +602,4 @@ def plot_kappa_tilde_region_iii_from_data():
     fig.show()
 
 
-plot_kappa_tilde_symmetric()
+plot_kappa_tilde_region_iii_from_data()

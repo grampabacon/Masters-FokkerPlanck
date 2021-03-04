@@ -211,7 +211,7 @@ def plot_prob(bias, kappas):
 
     plt.xlabel("Energy / W_c")
     plt.ylabel("P(E)")
-    plt.title("$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$, $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)) + "$W_c$", y=1.03)
+    plt.title("$W$=" + str(round(param.W, 2)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 2)) + "$W_c$, $W_L$=" + str(round(param.W_L, 2)) + "$W_c$, $W_R$=" + str(round(param.W_R, 2)) + "$W_c$", y=1.03)
 
     roots = find_roots(kappas)
 
@@ -219,7 +219,7 @@ def plot_prob(bias, kappas):
     labels = ["Extrema at: [" + ", ".join(map(str, roots)) + "]$W_c$"]
     plt.legend(handles, labels, loc='best', fontsize='large', fancybox=True, framealpha=0.7, handlelength=0, handletextpad=0)
 
-    filename = "Probability W=" + str(round(param.W, 1)) + ", eVb=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + ", WL=" + str(round(param.W_L, 1)) + ", WR=" + str(round(param.W_R, 1)) + ".png"
+    filename = "Probability W=" + str(round(param.W, 2)) + ", eVb=" + str(round(bias * const.ELEMENTARY_CHARGE, 2)) + ", WL=" + str(round(param.W_L, 2)) + ", WR=" + str(round(param.W_R, 2)) + ".png"
     plt.savefig("../out/" + filename, bbox_inches='tight')
     print("Saved: " + filename)
 
@@ -239,7 +239,7 @@ def plot_kappa(bias, kappas):
     plt.xlabel("Energy / W_c")
     plt.ylabel("Kappa / Hz")
     plt.title(
-        "$W$=" + str(round(param.W, 1)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + "$W_c$; $W_L$=" + str(round(param.W_L, 1)) + "$W_c$, $W_R$=" + str(round(param.W_R, 1)), y=1.03)
+        "$W$=" + str(round(param.W, 2)) + "$W_c$, $e V_b$=" + str(round(bias * const.ELEMENTARY_CHARGE, 2)) + "$W_c$; $W_L$=" + str(round(param.W_L, 2)) + "$W_c$, $W_R$=" + str(round(param.W_R, 2)), y=1.03)
 
     roots = find_roots(kappas)
     # for i in range(len(roots)):
@@ -253,7 +253,7 @@ def plot_kappa(bias, kappas):
         labels.append("Roots: [" + ", ".join(map(str, roots)) + "]$W_c$")
     plt.legend(handles, labels, loc='best', fontsize='large', fancybox=True, framealpha=0.7, handlelength=0, handletextpad=0)
 
-    filename = "Kappa W=" + str(round(param.W, 1)) + ", eVb=" + str(round(bias * const.ELEMENTARY_CHARGE, 1)) + ", WL=" + str(round(param.W_L, 1)) + ", WR=" + str(round(param.W_R, 1)) + ".png"
+    filename = "Kappa W=" + str(round(param.W, 2)) + ", eVb=" + str(round(bias * const.ELEMENTARY_CHARGE, 2)) + ", WL=" + str(round(param.W_L, 1)) + ", WR=" + str(round(param.W_R, 2)) + ".png"
     plt.savefig("../out/" + filename, bbox_inches='tight')
     print("Saved: " + filename)
 
@@ -319,4 +319,4 @@ def plot_graphs(w, e_bias):
 
 
 # plot_graphs(-0.8, 3)
-plot_graphs(-2.28, 6)
+plot_graphs(-1.95, 6)
