@@ -12,7 +12,7 @@ import inputs.parameters as param
 
 # Range of mechanical energies for plotting
 energy_min = 0
-energy_max = 3000
+energy_max = 200
 energy_divisions = 10000
 mechanical_energies = np.linspace(energy_min, energy_max, energy_divisions + 1)
 d_energy = (energy_max - energy_min) / energy_divisions
@@ -41,41 +41,44 @@ def fermi_distribution(energy):
 
 
 # Energy changes
-def displacement(mechanical_energy):
-    return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass) * np.sin(thetas)
+def displacement(mechanical_energy, average=True):
+    if average == True:
+        return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass) * np.sin(thetas)
+    else:
+        return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass)
 
 
-def energy_change_plus_left(mechanical_energy):
-    return - param.W + param.W_L - (param.coupling_force * displacement(mechanical_energy) / param.W_c)
+def energy_change_plus_left(mechanical_energy, average=True):
+    return - param.W + param.W_L - (param.coupling_force * displacement(mechanical_energy, average) / param.W_c)
 
 
-def energy_change_plus_right(mechanical_energy):
-    return - param.W + param.W_R - (param.coupling_force * displacement(mechanical_energy) / param.W_c)
+def energy_change_plus_right(mechanical_energy, average=True):
+    return - param.W + param.W_R - (param.coupling_force * displacement(mechanical_energy, average) / param.W_c)
 
 
-def energy_change_minus_left(mechanical_energy):
-    return param.W - param.W_L + (param.coupling_force * displacement(mechanical_energy) / param.W_c)
+def energy_change_minus_left(mechanical_energy, average=True):
+    return param.W - param.W_L + (param.coupling_force * displacement(mechanical_energy, average) / param.W_c)
 
 
-def energy_change_minus_right(mechanical_energy):
-    return param.W - param.W_R + (param.coupling_force * displacement(mechanical_energy) / param.W_c)
+def energy_change_minus_right(mechanical_energy, average=True):
+    return param.W - param.W_R + (param.coupling_force * displacement(mechanical_energy, average) / param.W_c)
 
 
 # Tunneling rates
-def gamma_plus_left(mechanical_energy):
-    return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(mechanical_energy)) * (1 - fermi_distribution(- energy_change_plus_left(mechanical_energy)))
+def gamma_plus_left(mechanical_energy, average=True):
+    return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(mechanical_energy, average)) * (1 - fermi_distribution(- energy_change_plus_left(mechanical_energy, average)))
 
 
-def gamma_plus_right(mechanical_energy):
-    return 2 * param.gamma_zero_right * np.exp(- param.tunneling_exponent_right * energy_change_plus_right(mechanical_energy)) * (1 - fermi_distribution(- energy_change_plus_right(mechanical_energy)))
+def gamma_plus_right(mechanical_energy, average=True):
+    return 2 * param.gamma_zero_right * np.exp(- param.tunneling_exponent_right * energy_change_plus_right(mechanical_energy, average)) * (1 - fermi_distribution(- energy_change_plus_right(mechanical_energy, average)))
 
 
-def gamma_minus_left(mechanical_energy):
-    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(mechanical_energy)) * (fermi_distribution(energy_change_minus_left(mechanical_energy)))
+def gamma_minus_left(mechanical_energy, average=True):
+    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(mechanical_energy, average)) * (fermi_distribution(energy_change_minus_left(mechanical_energy, average)))
 
 
-def gamma_minus_right(mechanical_energy):
-    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(mechanical_energy)) * (fermi_distribution(energy_change_minus_right(mechanical_energy)))
+def gamma_minus_right(mechanical_energy, average=True):
+    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(mechanical_energy, average)) * (fermi_distribution(energy_change_minus_right(mechanical_energy, average)))
 
 
 # # Tunneling rate derivatives
@@ -127,12 +130,12 @@ def d_gamma_minus_right(mechanical_energy):
 
 
 # Total on and off tunneling rates
-def gamma_plus(mechanical_energy):
-    return gamma_plus_left(mechanical_energy) + gamma_plus_right(mechanical_energy)
+def gamma_plus(mechanical_energy, average=True):
+    return gamma_plus_left(mechanical_energy, average) + gamma_plus_right(mechanical_energy, average)
 
 
-def gamma_minus(mechanical_energy):
-    return gamma_minus_left(mechanical_energy) + gamma_minus_right(mechanical_energy)
+def gamma_minus(mechanical_energy, average=True):
+    return gamma_minus_left(mechanical_energy, average) + gamma_minus_right(mechanical_energy, average)
 
 
 # Total on and off tunneling rate derivatives

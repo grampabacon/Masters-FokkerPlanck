@@ -1,3 +1,5 @@
+import numpy
+
 import main
 import numpy as np
 import matplotlib as mpl
@@ -260,6 +262,159 @@ def plot_kappa(bias, kappas):
     plt.show()
 
 
+def plot_plus_minus_rates(w, e_bias):
+    param.W = w
+    bias = e_bias / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)
+    param.W_R = w_right(bias)
+
+    fig, ax = plt.subplots(num='Rates')
+
+    gamma_plus = main.gamma_plus(main.mechanical_energies, False)
+    gamma_minus = main.gamma_minus(main.mechanical_energies, False)
+
+    ax.plot(main.mechanical_energies, gamma_plus, 'g', label='$\Gamma^+$')
+    ax.plot(main.mechanical_energies, gamma_minus, 'r', label='$\Gamma^-$')
+
+    ax.legend()
+
+    fig.show()
+
+
+def plot_rates_plus_left_right_subplots(w, e_bias):
+    param.W = w
+    bias = e_bias / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)
+    param.W_R = w_right(bias)
+
+    width = 1
+    epsilon_zero = 1
+
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 5), num='Plus Rates Modified Subplots')
+
+    gamma_left = main.gamma_plus_left(main.mechanical_energies, False)
+    gamma_right = main.gamma_plus_right(main.mechanical_energies, False)
+
+    axes[0].plot(main.mechanical_energies, gamma_left, 'g', label='$\Gamma^+_L$', linestyle='--')
+    axes[1].plot(main.mechanical_energies, gamma_right, 'r', label='$\Gamma^+_R$', linestyle='-.')
+
+    axes[0].xaxis.set_label_text("E (units of $W_c$)", fontsize=14)
+    axes[1].xaxis.set_label_text("E (units of $W_c$)", fontsize=14)
+
+    axes[0].yaxis.set_label_text("$\Gamma$ / Hz", fontsize=14)
+
+    axes[0].tick_params(axis='x', direction='in', labelsize=12)
+    axes[0].tick_params(axis='y', direction='in', labelsize=12)
+
+    axes[1].tick_params(axis='x', direction='in', labelsize=12)
+    axes[1].tick_params(axis='y', direction='in', labelsize=12)
+
+    axes[0].legend()
+    axes[1].legend()
+
+    params = "W=" + str(w) + "$W_c$, $e V_b$=" + str(e_bias) + "$W_c$, $\epsilon_0$=" + str(epsilon_zero) + "$W_c$, $\sigma$=" + str(width) + "$W_c$"
+    title = "Modified Tunneling Rates onto the Island\n" + params
+    fig.suptitle(title)
+
+    fig.tight_layout()
+
+
+def plot_rates_plus_left_right(w, e_bias):
+    param.W = w
+    bias = e_bias / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)
+    param.W_R = w_right(bias)
+
+    fig, ax = plt.subplots(num='Plus Rates')
+
+    gamma_left = main.gamma_plus_left(main.mechanical_energies, False)
+    gamma_right = main.gamma_plus_right(main.mechanical_energies, False)
+
+    ax.plot(main.mechanical_energies, gamma_left, 'g', label='$\Gamma^+_L$', linestyle='--')
+    ax.plot(main.mechanical_energies, gamma_right, 'r', label='$\Gamma^+_R$', linestyle='-.')
+
+    ax.xaxis.set_label_text("E (units of $W_c$)", fontsize=14)
+    ax.yaxis.set_label_text("$\Gamma$ / Hz", fontsize=14)
+
+    ax.tick_params(axis='x', direction='in', labelsize=12)
+    ax.tick_params(axis='y', direction='in', labelsize=12)
+
+    ax.legend()
+
+    params = "W=" + str(w) + "$W_c$, $e V_b$=" + str(e_bias) + "$W_c$"
+    title = "Tunneling Rates onto the Island\n" + params
+    ax.set_title(title)
+
+    fig.tight_layout()
+
+
+def plot_rates_minus_left_right_subplots(w, e_bias):
+    param.W = w
+    bias = e_bias / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)
+    param.W_R = w_right(bias)
+
+    width = 1
+    epsilon_zero = 1
+
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 5), num='minus Rates Modified Subplots')
+
+    gamma_left = main.gamma_minus_left(main.mechanical_energies, False)
+    gamma_right = main.gamma_minus_right(main.mechanical_energies, width, epsilon_zero, False)
+
+    axes[0].plot(main.mechanical_energies, gamma_left, 'g', label='$\Gamma^+_L$', linestyle='--')
+    axes[1].plot(main.mechanical_energies, gamma_right, 'r', label='$\Gamma^+_R$', linestyle='-.')
+
+    axes[0].xaxis.set_label_text("E (units of $W_c$)", fontsize=14)
+    axes[1].xaxis.set_label_text("E (units of $W_c$)", fontsize=14)
+
+    axes[0].yaxis.set_label_text("$\Gamma$ / Hz", fontsize=14)
+
+    axes[0].tick_params(axis='x', direction='in', labelsize=12)
+    axes[0].tick_params(axis='y', direction='in', labelsize=12)
+
+    axes[1].tick_params(axis='x', direction='in', labelsize=12)
+    axes[1].tick_params(axis='y', direction='in', labelsize=12)
+
+    axes[0].legend()
+    axes[1].legend()
+
+    params = "W=" + str(w) + "$W_c$, $e V_b$=" + str(e_bias) + "$W_c$, $\epsilon_0$=" + str(epsilon_zero) + "$W_c$, $\sigma$=" + str(width) + "$W_c$"
+    title = "Modified Tunneling Rates onto the Island\n" + params
+    fig.suptitle(title)
+
+    fig.tight_layout()
+
+
+def plot_rates_minus_left_right(w, e_bias):
+    param.W = w
+    bias = e_bias / const.ELEMENTARY_CHARGE
+    param.W_L = w_left(bias)
+    param.W_R = w_right(bias)
+
+    fig, ax = plt.subplots(num='Minus Rates')
+
+    gamma_left = main.gamma_minus_left(main.mechanical_energies, False)
+    gamma_right = main.gamma_minus_right(main.mechanical_energies, False)
+
+    ax.plot(main.mechanical_energies, gamma_left, 'g', label='$\Gamma^-_L$', linestyle='--')
+    ax.plot(main.mechanical_energies, gamma_right, 'r', label='$\Gamma^-_R$', linestyle='-.')
+
+    ax.xaxis.set_label_text("E (units of $W_c$)", fontsize=14)
+    ax.yaxis.set_label_text("$\Gamma$ / Hz", fontsize=14)
+
+    ax.tick_params(axis='x', labelsize=12)
+    ax.tick_params(axis='y', labelsize=12)
+
+    ax.legend()
+
+    params = "W=" + str(w) + "$W_c$, $e V_b$=" + str(e_bias) + "$W_c$"
+    title = "Tunneling Rates off of the Island\n" + params
+    ax.set_title(title)
+
+    fig.tight_layout()
+
+
 def find_roots(kappas):
     # param.W = 2
     # bias = 9 / const.ELEMENTARY_CHARGE
@@ -318,5 +473,6 @@ def plot_graphs(w, e_bias):
     plot_prob(bias, kappas)
 
 
-# plot_graphs(-0.8, 3)
-plot_graphs(-1.95, 6)
+# plot_graphs(-1.95, 6)
+plot_rates_plus_left_right(0, -5)
+plot_rates_minus_left_right(0, -5)
