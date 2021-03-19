@@ -1,17 +1,14 @@
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import matplotlib.colors as colors
 import inputs.constants as const
 import inputs.parameters as param
+mpl.rcParams['figure.dpi'] = 150
 
 
-###########################################################################################################################################################################
-# This file has the rates for particles moving onto and off the island modified. We found for a_L = 0.3 and a_R = 0.75 that it made more sense to modify the right rates. #
-# kappa-tilde-modifed-rates-right-rates.py handles that case.                                                                                                             #
-###########################################################################################################################################################################
-
-mechanical_energy = 40
+mechanical_energy = 0
 
 theta_divisions = 400
 theta_list = np.linspace(0, np.pi, theta_divisions)
@@ -32,7 +29,7 @@ def fermi_distribution(energy_change):
 
 
 def gaussian(energy_change, epsilon_zero, width):
-    return np.exp((energy_change - epsilon_zero) ** 2 / (2 * (width ** 2)))
+    return np.exp(- (energy_change - epsilon_zero) ** 2 / (2 * (width ** 2)))
 
 
 def gamma_plus_left_e0(epsilon_zero):
@@ -85,13 +82,13 @@ def gamma_minus_right(w, e_bias):
 # Derivatives of the tunneling rate with respect to W
 def d_gamma_plus_left_modified(w, e_bias, epsilon_zero, width):
     return ((2 * param.gamma_zero_left) / (width ** 2)) * np.exp((param.tunneling_exponent_left + (1 / param.kT)) * energy_change_minus_left(w, e_bias)) * (gaussian(energy_change_minus_left(w, e_bias), epsilon_zero, width) / gamma_plus_left_e0(epsilon_zero)) \
-           * (- epsilon_zero + energy_change_minus_left(w, e_bias) + (param.tunneling_exponent_left + (1 / param.kT)) * (width ** 2) + (- epsilon_zero + energy_change_minus_left(w, e_bias) + param.tunneling_exponent_left * (width ** 2))) \
+           * ((1 / param.kT) * (width ** 2) + (1 + np.exp(energy_change_minus_left(w, e_bias))) * (epsilon_zero - energy_change_minus_left(w, e_bias) + param.tunneling_exponent_left * (width ** 2))) \
            * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
 
 
 def d_gamma_minus_left_modified(w, e_bias, epsilon_zero, width):
     return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (gaussian(energy_change_minus_left(w, e_bias), epsilon_zero, width) / gamma_minus_left_e0(epsilon_zero)) * (- (1 / param.kT) * np.exp(energy_change_minus_left(w, e_bias) / param.kT)
-            + (1 + np.exp(energy_change_minus_left(w, e_bias) / param.kT)) * (param.tunneling_exponent_left + ((- epsilon_zero + energy_change_minus_left(w, e_bias)) / (width ** 2)))) \
+            + (1 + np.exp(energy_change_minus_left(w, e_bias) / param.kT)) * (param.tunneling_exponent_left - ((- epsilon_zero + energy_change_minus_left(w, e_bias)) / (width ** 2)))) \
             * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
 
 
@@ -292,11 +289,11 @@ def plot_kappa_tilde_symmetric():
     w_mesh2, bias_mesh2 = np.meshgrid(w_list2, e_bias_list2)
 
     epsilon_zero = 0
-    width = 10
+    width = 100
 
     kt2 = kappa_tilde_mesh(w_mesh2, bias_mesh2, epsilon_zero, width)
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(num="Modified Left Rates Kappa")
 
     # ax.imshow(dn, extent=[-5, 5, 0, 10], origin='lower', cmap='RdGy', alpha=1)
     # im = ax.imshow(dn, extent=[-5, 5, 0, 10], origin='lower', cmap='coolwarm', alpha=1)
@@ -318,17 +315,17 @@ def plot_kappa_tilde_symmetric():
     ax.xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
     ax.yaxis.set_label_text("$e V_b$ (units of $W_c$)", fontsize=14)
 
-    title = "E= " + str(mechanical_energy) + "$W_c$, $\epsilon_0=$" + str(epsilon_zero) + "$W_c$, $\sigma=$" + str(width) + "$W_c$"
+    title = "Modified Left Rates\n" + "E=" + str(mechanical_energy) + "$W_c$, $\epsilon_0=$" + str(epsilon_zero) + "$W_c$, $\sigma=$" + str(width) + "$W_c$, $A$=1"
     ax.set_title(title)
 
     cb = fig.colorbar(im, orientation='vertical')
-    cb.set_label("$\kappa$-tilde", size=14)
+    cb.set_label("$\kappa$-tilde / $s^{-1}$", size=14)
     # cb.ax.set_title("$\partial_W n$", size=14)
     cb.ax.tick_params(labelsize='large')
 
     ax.set_aspect(0.4)
 
-    fig.show()
+    fig.tight_layout()
 
 
 # def plot_kappa_tilde_dn_dw_bias_slice():

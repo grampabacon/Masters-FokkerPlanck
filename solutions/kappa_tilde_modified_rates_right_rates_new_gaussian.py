@@ -28,7 +28,7 @@ def fermi_distribution(energy_change):
 
 
 def gaussian(energy_change, epsilon_zero, width):
-    return np.exp((energy_change - epsilon_zero) ** 2 / (2 * (width ** 2)))
+    return np.exp(- (energy_change - epsilon_zero) ** 2 / (2 * (width ** 2)))
 
 
 def gamma_plus_right_e0(epsilon_zero):
@@ -84,13 +84,13 @@ def gamma_minus_left(w, e_bias, average=True):
 # Derivatives of the tunneling rate with respect to W
 def d_gamma_plus_right_modified(w, e_bias, epsilon_zero, width, average=True):
     return ((2 * param.gamma_zero_right) / (width ** 2)) * np.exp((param.tunneling_exponent_right + (1 / param.kT)) * energy_change_minus_right(w, e_bias, average)) * (gaussian(energy_change_minus_right(w, e_bias, average), epsilon_zero, width) / gamma_plus_right_e0(epsilon_zero)) \
-           * (- epsilon_zero + energy_change_minus_right(w, e_bias, average) + (param.tunneling_exponent_right + (1 / param.kT)) * (width ** 2) + np.exp(energy_change_minus_right(w, e_bias, average) / param.kT) * (- epsilon_zero + energy_change_minus_right(w, e_bias, average) + param.tunneling_exponent_right * (width ** 2))) \
+           * ((1 / param.kT) * (width ** 2) + (1 + np.exp(energy_change_minus_right(w, e_bias, average) / param.kT)) * (epsilon_zero - energy_change_minus_right(w, e_bias, average) + param.tunneling_exponent_right * (width ** 2))) \
            * (fermi_distribution(energy_change_minus_right(w, e_bias, average)) ** 2)
 
 
 def d_gamma_minus_right_modified(w, e_bias, epsilon_zero, width, average=True):
     return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(w, e_bias, average)) * (gaussian(energy_change_minus_right(w, e_bias, average), epsilon_zero, width) / gamma_minus_right_e0(epsilon_zero)) * (- (1 / param.kT) * np.exp(energy_change_minus_right(w, e_bias, average) / param.kT)
-            + (1 + np.exp(energy_change_minus_right(w, e_bias, average) / param.kT)) * (param.tunneling_exponent_right + ((- epsilon_zero + energy_change_minus_right(w, e_bias, average)) / (width ** 2)))) \
+            + (1 + np.exp(energy_change_minus_right(w, e_bias, average) / param.kT)) * (param.tunneling_exponent_right - ((- epsilon_zero + energy_change_minus_right(w, e_bias, average)) / (width ** 2)))) \
             * (fermi_distribution(energy_change_minus_right(w, e_bias, average)) ** 2)
 
 
@@ -281,7 +281,7 @@ def plot_plus_rates_bias_slice(e_bias):
 
 def plot_minus_rates_bias_slice(e_bias):
     epsilon_zero = 0
-    width = 100
+    width = 10
 
     gamma_left = np.ndarray(len(w_list))
     gamma_right = np.ndarray(len(w_list))
@@ -393,11 +393,11 @@ def plot_kappa_tilde_symmetric():
     w_mesh2, bias_mesh2 = np.meshgrid(w_list2, e_bias_list2)
 
     epsilon_zero = 0
-    width = 1
+    width = 2
 
     kt2 = kappa_tilde_mesh(w_mesh2, bias_mesh2, epsilon_zero, width)
 
-    fig, ax = plt.subplots(num='kappa-tilde symmetric')
+    fig, ax = plt.subplots(num="Modified Right Rates Kappa")
 
     # ax.imshow(dn, extent=[-5, 5, 0, 10], origin='lower', cmap='RdGy', alpha=1)
     # im = ax.imshow(dn, extent=[-5, 5, 0, 10], origin='lower', cmap='coolwarm', alpha=1)
@@ -419,7 +419,7 @@ def plot_kappa_tilde_symmetric():
     ax.xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
     ax.yaxis.set_label_text("$e V_b$ (units of $W_c$)", fontsize=14)
 
-    title = "E= " + str(mechanical_energy) + "$W_c$, $\epsilon_0=$" + str(epsilon_zero) + "$W_c$, $\sigma=$" + str(width) + "$W_c$, $A^+$=" + str(1 / gamma_plus_right_e0(epsilon_zero)) + ", $A^-$=" + str(1 / gamma_minus_right_e0(epsilon_zero))
+    title = "Modified Right Rates\n" + "E= " + str(mechanical_energy) + "$W_c$, $\epsilon_0=$" + str(epsilon_zero) + "$W_c$, $\sigma=$" + str(width) + "$W_c$, $A$=1"
     ax.set_title(title)
 
     cb = fig.colorbar(im, orientation='vertical')
@@ -812,4 +812,6 @@ def plot_kappa_tilde_region_iii_from_data():
     fig.show()
 
 
+# plot_plus_rates_bias_slice(-5)
+# plot_minus_rates_bias_slice(-5)
 plot_kappa_tilde_symmetric()

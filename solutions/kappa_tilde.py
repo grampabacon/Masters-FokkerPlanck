@@ -1,9 +1,13 @@
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import matplotlib.colors as colors
 import inputs.constants as const
 import inputs.parameters as param
+import main
+mpl.rcParams['figure.dpi'] = 150
+
 
 mechanical_energy = 0
 
@@ -26,67 +30,70 @@ def fermi_distribution(energy_change):
 
 
 # Calculates oscillator transverse displacement using the mechanical energy of the oscillator
-def displacement():
-    return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass) * np.sin(theta_list)
+def displacement(average):
+    if average:
+        return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass) * np.sin(theta_list)
+    else:
+        return (1 / param.oscillator_frequency) * np.sqrt((2 * mechanical_energy * param.W_c) / param.oscillator_mass)
 
 
 # Changes in energy available for tunneling after an electron tunnels on or off the island from the left or the right
-def energy_change_plus_left(w, e_bias):
-    return - w + w_left(e_bias) - (param.coupling_force * displacement() / param.W_c)
+def energy_change_plus_left(w, e_bias, average):
+    return - w + w_left(e_bias) - (param.coupling_force * displacement(average) / param.W_c)
 
 
-def energy_change_plus_right(w, e_bias):
-    return - w + w_right(e_bias) - (param.coupling_force * displacement() / param.W_c)
+def energy_change_plus_right(w, e_bias, average):
+    return - w + w_right(e_bias) - (param.coupling_force * displacement(average) / param.W_c)
 
 
-def energy_change_minus_left(w, e_bias):
-    return w - w_left(e_bias) + (param.coupling_force * displacement() / param.W_c)
+def energy_change_minus_left(w, e_bias, average):
+    return w - w_left(e_bias) + (param.coupling_force * displacement(average) / param.W_c)
 
 
-def energy_change_minus_right(w, e_bias):
-    return w - w_right(e_bias) + (param.coupling_force * displacement() / param.W_c)
+def energy_change_minus_right(w, e_bias, average):
+    return w - w_right(e_bias) + (param.coupling_force * displacement(average) / param.W_c)
 
 
 # Tunneling rates
-def gamma_plus_left(w, e_bias):
-    return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(w, e_bias)) * (1 - fermi_distribution(- energy_change_plus_left(w, e_bias)))
+def gamma_plus_left(w, e_bias, average=True):
+    return 2 * param.gamma_zero_left * np.exp(- param.tunneling_exponent_left * energy_change_plus_left(w, e_bias, average)) * (1 - fermi_distribution(- energy_change_plus_left(w, e_bias, average)))
 
 
-def gamma_plus_right(w, e_bias):
-    return 2 * param.gamma_zero_right * np.exp(- param.tunneling_exponent_right * energy_change_plus_right(w, e_bias)) * (1 - fermi_distribution(- energy_change_plus_right(w, e_bias)))
+def gamma_plus_right(w, e_bias, average=True):
+    return 2 * param.gamma_zero_right * np.exp(- param.tunneling_exponent_right * energy_change_plus_right(w, e_bias, average)) * (1 - fermi_distribution(- energy_change_plus_right(w, e_bias, average)))
 
 
-def gamma_minus_left(w, e_bias):
-    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (fermi_distribution(energy_change_minus_left(w, e_bias)))
+def gamma_minus_left(w, e_bias, average=True):
+    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias, average)) * (fermi_distribution(energy_change_minus_left(w, e_bias, average)))
 
 
-def gamma_minus_right(w, e_bias):
-    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(w, e_bias)) * (fermi_distribution(energy_change_minus_right(w, e_bias)))
+def gamma_minus_right(w, e_bias, average=True):
+    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(w, e_bias, average)) * (fermi_distribution(energy_change_minus_right(w, e_bias, average)))
 
 
 # Derivatives of the tunneling rate with respect to W
-def d_gamma_plus_left(w, e_bias):
-    return 2 * param.gamma_zero_left * np.exp((param.tunneling_exponent_left + (1 / param.kT)) * energy_change_minus_left(w, e_bias)) * (param.tunneling_exponent_left +
-                                                                                                                                         param.tunneling_exponent_left * np.exp(energy_change_minus_left(w, e_bias) / param.kT) +
-                                                                                                                                         (1 / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
+def d_gamma_plus_left(w, e_bias, average=True):
+    return 2 * param.gamma_zero_left * np.exp((param.tunneling_exponent_left + (1 / param.kT)) * energy_change_minus_left(w, e_bias, average)) * (param.tunneling_exponent_left +
+                                                                                                                                         param.tunneling_exponent_left * np.exp(energy_change_minus_left(w, e_bias, average) / param.kT) +
+                                                                                                                                         (1 / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias, average)) ** 2)
 
 
-def d_gamma_plus_right(w, e_bias):
-    return 2 * param.gamma_zero_right * np.exp((param.tunneling_exponent_right + (1 / param.kT)) * energy_change_minus_right(w, e_bias)) * (param.tunneling_exponent_right +
-                                                                                                                                            param.tunneling_exponent_right * np.exp(energy_change_minus_right(w, e_bias) / param.kT) +
-                                                                                                                                            (1 / param.kT)) * (fermi_distribution(energy_change_minus_right(w, e_bias)) ** 2)
+def d_gamma_plus_right(w, e_bias, average=True):
+    return 2 * param.gamma_zero_right * np.exp((param.tunneling_exponent_right + (1 / param.kT)) * energy_change_minus_right(w, e_bias, average)) * (param.tunneling_exponent_right +
+                                                                                                                                            param.tunneling_exponent_right * np.exp(energy_change_minus_right(w, e_bias, average) / param.kT) +
+                                                                                                                                            (1 / param.kT)) * (fermi_distribution(energy_change_minus_right(w, e_bias, average)) ** 2)
 
 
-def d_gamma_minus_left(w, e_bias):
-    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias)) * (param.tunneling_exponent_left +
+def d_gamma_minus_left(w, e_bias, average=True):
+    return param.gamma_zero_left * np.exp(param.tunneling_exponent_left * energy_change_minus_left(w, e_bias, average)) * (param.tunneling_exponent_left +
                                                                                                                   (param.tunneling_exponent_left - (1 / param.kT)) *
-                                                                                                                  np.exp(energy_change_minus_left(w, e_bias) / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias)) ** 2)
+                                                                                                                  np.exp(energy_change_minus_left(w, e_bias, average) / param.kT)) * (fermi_distribution(energy_change_minus_left(w, e_bias, average)) ** 2)
 
 
-def d_gamma_minus_right(w, e_bias):
-    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(w, e_bias)) * (param.tunneling_exponent_right +
+def d_gamma_minus_right(w, e_bias, average=True):
+    return param.gamma_zero_right * np.exp(param.tunneling_exponent_right * energy_change_minus_right(w, e_bias, average)) * (param.tunneling_exponent_right +
                                                                                                                      (param.tunneling_exponent_right - (1 / param.kT)) *
-                                                                                                                     np.exp(energy_change_minus_right(w, e_bias) / param.kT)) * (fermi_distribution(energy_change_minus_right(w, e_bias)) ** 2)
+                                                                                                                     np.exp(energy_change_minus_right(w, e_bias, average) / param.kT)) * (fermi_distribution(energy_change_minus_right(w, e_bias, average)) ** 2)
 
 
 def gamma_plus(w, e_bias):
@@ -166,6 +173,100 @@ def kappa_tilde_bias_slice(w, e_bias):
 
         kappa_tilde_b[i] = k
     return kappa_tilde_b
+
+
+def plot_plus_rates_bias_slice(e_bias):
+    gamma_left = np.ndarray(len(w_list))
+    gamma_right = np.ndarray(len(w_list))
+
+    for i in range(len(w_list)):
+        gamma_left[i] = gamma_plus_left(w_list[i], e_bias, False)
+        gamma_right[i] = gamma_plus_right(w_list[i], e_bias, False)
+
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 5), num='Plus Rates Slice Subplots')
+
+    axes[0].plot(w_list, gamma_left, 'g', label='$\Gamma^+_L$', linestyle='--')
+    axes[1].plot(w_list, gamma_right, 'r', label='$\Gamma^+_R$', linestyle='-.')
+
+    axes[0].xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+    axes[1].xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+
+    axes[0].yaxis.set_label_text("$\Gamma$ / Hz", fontsize=14)
+
+    axes[0].tick_params(axis='x', direction='in', labelsize=12)
+    axes[0].tick_params(axis='y', direction='in', labelsize=12)
+
+    axes[1].tick_params(axis='x', direction='in', labelsize=12)
+    axes[1].tick_params(axis='y', direction='in', labelsize=12)
+
+    axes[0].legend()
+    axes[1].legend()
+
+    params = "$e V_b$=" + str(e_bias) + "$W_c$"  # , $\epsilon_0$=" + str(epsilon_zero) + "$W_c$, $\sigma$=" + str(width) + "$W_c$"
+    title = "Un-Modified Tunneling Rates onto the Island\n" + params
+    fig.suptitle(title)
+
+    fig2, ax = plt.subplots(num='Plus Rates Slice Single')
+
+    ax.plot(w_list, gamma_left, 'g', label='$\Gamma^+_L$', linestyle='--')
+    ax.plot(w_list, gamma_right, 'r', label='$\Gamma^+_R$', linestyle='-.')
+
+    ax.xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+    ax.yaxis.set_label_text("$\Gamma$ / Hz", fontsize=14)
+
+    ax.legend()
+
+    fig2.suptitle(title)
+
+    fig.tight_layout()
+    fig2.tight_layout()
+
+
+def plot_minus_rates_bias_slice(e_bias):
+    gamma_left = np.ndarray(len(w_list))
+    gamma_right = np.ndarray(len(w_list))
+
+    for i in range(len(w_list)):
+        gamma_left[i] = gamma_minus_left(w_list[i], e_bias, False)
+        gamma_right[i] = gamma_minus_right(w_list[i], e_bias, False)
+
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 5), num='Minus Rates Slice Subplots')
+
+    axes[0].plot(w_list, gamma_left, 'g', label='$\Gamma^-_L$', linestyle='--')
+    axes[1].plot(w_list, gamma_right, 'r', label='$\Gamma^-_R$', linestyle='-.')
+
+    axes[0].xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+    axes[1].xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+
+    axes[0].yaxis.set_label_text("$\Gamma$ / Hz", fontsize=14)
+
+    axes[0].tick_params(axis='x', direction='in', labelsize=12)
+    axes[0].tick_params(axis='y', direction='in', labelsize=12)
+
+    axes[1].tick_params(axis='x', direction='in', labelsize=12)
+    axes[1].tick_params(axis='y', direction='in', labelsize=12)
+
+    axes[0].legend()
+    axes[1].legend()
+
+    params = "$e V_b$=" + str(e_bias) + "$W_c$"  # , $\epsilon_0$=" + str(epsilon_zero) + "$W_c$, $\sigma$=" + str(width) + "$W_c$"
+    title = "Un-Modified Tunneling Rates off of the Island\n" + params
+    fig.suptitle(title)
+
+    fig2, ax = plt.subplots(num='Minus Rates Slice Single')
+
+    ax.plot(w_list, gamma_left, 'g', label='$\Gamma^-_L$', linestyle='--')
+    ax.plot(w_list, gamma_right, 'r', label='$\Gamma^-_R$', linestyle='-.')
+
+    ax.xaxis.set_label_text("W (units of $W_c$)", fontsize=14)
+    ax.yaxis.set_label_text("$\Gamma$ / Hz", fontsize=14)
+
+    ax.legend()
+
+    fig2.suptitle(title)
+
+    fig.tight_layout()
+    fig2.tight_layout()
 
 
 def plot_dn_dw():
@@ -602,4 +703,5 @@ def plot_kappa_tilde_region_iii_from_data():
     fig.tight_layout()
 
 
-plot_kappa_tilde_region_iii_from_data()
+plot_plus_rates_bias_slice(5)
+plot_minus_rates_bias_slice(5)

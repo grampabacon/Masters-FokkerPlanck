@@ -9,6 +9,7 @@ import math
 import inputs.constants as const
 import inputs.parameters as param
 mpl.use('Qt5Agg')
+mpl.rcParams['figure.dpi'] = 150
 
 ################################################
 #                                              #
@@ -474,5 +475,5 @@ def plot_graphs(w, e_bias):
 
 
 # plot_graphs(-1.95, 6)
-plot_rates_plus_left_right(0, -5)
-plot_rates_minus_left_right(0, -5)
+plot_rates_plus_left_right_subplots(0, 1)
+plot_rates_minus_left_right_subplots(0, 1)
